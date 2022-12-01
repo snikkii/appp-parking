@@ -1,0 +1,124 @@
+\documentclass[12pt,oneside]{report}
+\usepackage{listings}
+\usepackage[T1]{fontenc}		
+\usepackage[utf8x]{inputenc}
+\usepackage[ngerman]{babel}
+
+\usepackage{parskip}			
+
+\usepackage[a4paper,		
+	    left=2.5cm,				
+	    right=2.5cm,			
+	    top=1.5cm,				
+	    bottom=1.5cm,			
+	    marginparsep=5mm,		
+	    marginparwidth=10mm, 	
+	    headheight=7mm,			
+	    headsep=1.2cm,			
+	    footskip=1.5cm,			
+	    includeheadfoot]{geometry}
+
+\usepackage{fancyhdr}						
+\pagestyle{fancy}							
+\fancyhf{}									
+\setlength{\headwidth}{\textwidth}			
+\fancyfoot[R]{\thepage} 					
+\fancyfoot[L]{\leftmark}					
+\fancyhead[R]{\IhreArbeit}					
+\fancyhead[L]{\IhrVorname\ \IhrNachname}	
+\renewcommand{\chaptermark}[1]{			
+  \markboth{Kapitel \thechapter. #1}{}}
+\renewcommand{\headrulewidth}{0.5pt}		
+\renewcommand{\footrulewidth}{0.5pt}		
+\fancypagestyle{plain}{					
+  \fancyhf{}								
+  \fancyfoot[C]{\thepage}					
+  \fancyhead[R]{\IhreArbeit}				
+  \fancyhead[L]{\IhrVorname\ \IhrNachname}	
+}
+
+\usepackage{amsmath}			
+\usepackage{amssymb}
+\usepackage[intlimits]{empheq}
+
+\usepackage[sc]{mathpazo}		
+\usepackage{pifont}				
+
+\usepackage[format=hang,		
+            font={footnotesize},
+            labelfont={bf},
+            margin=1cm,
+            aboveskip=5pt,
+            position=bottom]{caption}
+
+\usepackage{graphicx}							
+\usepackage[svgnames,table,hyperref]{xcolor} 
+\usepackage{tikz}								
+\usetikzlibrary{positioning,arrows,plotmarks} 
+
+\usepackage{microtype,relsize}			
+\newcommand*{\Sperren}[1]{\textls*[100]{#1}}
+
+
+\newcommand*{\IhrVorname}{Annika}
+\newcommand*{\IhrNachname}{Stadelmann}
+\newcommand*{\IhrStudiengang}{Medieninformatik}
+\newcommand*{\IhreArbeit}{Studienarbeit App-Programmierung WiSe 2022/23}
+\newcommand*{\IhrTitelDE}{Entwicklung eines Parkleitsystems}
+\newcommand*{\IhrBearbeitungszeitraumVON}{22. November 2022}
+\newcommand*{\IhrBearbeitungszeitraumBIS}{17. Januar 2023}
+
+
+\usepackage[bookmarks, raiselinks, pageanchor,
+            hyperindex, colorlinks,
+            citecolor=black, linkcolor=black,
+            urlcolor=black, filecolor=black,
+            menucolor=black]{hyperref}
+\hypersetup{pdftitle={\IhrTitelDE},
+            pdfauthor={\IhrVorname\ \IhrNachname},
+            pdfsubject={\IhreArbeit}}
+
+\lstset{numbers=left, numberstyle=\tiny, numbersep=5pt}
+\lstset{language=Java}
+
+
+
+\begin{document}
+  \pagenumbering{roman}
+  \begin{titlepage}					
+    \thispagestyle{empty}
+    \begin{center}
+      \Large
+      Ostbayerische Technische Hochschule Amberg-Weiden\\
+      Fakultät Elektrotechnik, Medien und Informatik\\[1cm]
+      Studiengang \IhrStudiengang\\[1cm]
+      \textbf{\IhreArbeit}\\[1cm]
+      von\\[1cm]
+      \IhrVorname\ \Sperren{\textbf{\IhrNachname}}\\[1cm]
+      \textbf{\IhrTitelDE}\\[1cm]
+    \end{center}
+    \vspace*{11cm}
+    \begin{tabbing}
+      \underbar{Bearbeitungszeitraum:}\qquad\= von\qquad\=\IhrBearbeitungszeitraumVON\\
+                                        \> bis      \>\IhrBearbeitungszeitraumBIS
+    \end{tabbing}
+  \end{titlepage}
+  
+  \tableofcontents
+  \newpage
+  
+  \pagenumbering{arabic}
+  \include{kapitel1}
+  
+  \phantomsection
+  \addcontentsline{toc}{chapter}{Literaturverzeichnis}
+  \begin{thebibliography}{10}
+    \bibitem{quelle1} Schreiberling, Tim: ,,Bestseller-Buch'', 1.~Auflage, S.~13ff, Renner-Verlag, Musterstadt, 2011.
+  \end{thebibliography}
+  \newpage
+  
+  \phantomsection
+  \addcontentsline{toc}{chapter}{Abbildungsverzeichnis}
+  \listoffigures
+  \newpage
+\end{document}    
