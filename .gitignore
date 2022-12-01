@@ -12,3 +12,13 @@ web-build/
 
 # macOS
 .DS_Store
+
+
+/doku/*.aux
+/doku/*.fdb_latexmk
+/doku/*.fls
+/doku/*.lof
+/doku/*.log
+/doku/*.out
+/doku/*.gz
+/doku/*.toc
