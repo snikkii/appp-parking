@@ -5,6 +5,7 @@ export interface ParkingArea {
   openingHours: string;
   pricePerHour: string;
   doorHeight: string;
+  favorite?: boolean;
   lat: number;
   long: number;
 }
