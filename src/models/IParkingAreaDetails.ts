@@ -1,6 +1,6 @@
-export interface ParkingAreaDetails {
+export interface IParkingAreaDetails {
   id: number;
-  favorite: boolean;
+  parkingAreaId: number;
   numberOfLots: number;
   numberOfTakenLots: number;
   numberOfFreeLots: number;

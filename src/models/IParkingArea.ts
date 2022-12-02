@@ -1,4 +1,4 @@
-export interface ParkingArea {
+export interface IParkingArea {
   id: number;
   name: string;
   adress: string;
