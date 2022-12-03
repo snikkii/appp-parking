@@ -1,5 +1,5 @@
 import { StatusBar } from "expo-status-bar";
-import { Dimensions, Platform, StyleSheet, Text, View } from "react-native";
+import { Alert, Dimensions, Platform, StyleSheet, View } from "react-native";
 import { ParkingMap } from "./src/components/ParkingMap";
 import * as SQLite from "expo-sqlite";
 import { useEffect, useState } from "react";
@@ -7,6 +7,8 @@ import { allParkingAreas } from "./src/AllParkingAreas";
 import { IParkingArea } from "./src/models/IParkingArea";
 import ParkingAreaDescription from "./src/components/ParkingAreaDescription";
 import Settings from "./src/components/Settings";
+import { XMLParser } from "fast-xml-parser";
+import { decode } from "html-entities";
 
 function openDatabase() {
   if (Platform.OS === "web") {
@@ -24,13 +26,13 @@ function openDatabase() {
 }
 
 const parkingAreaDb = openDatabase();
-const detailsDb = openDatabase();
 
 export default function App() {
   const [parkingAreaId, setParkingAreaId] = useState(0);
   const [showDescription, setShowDescription] = useState(false);
   const [latUser, setLatUser] = useState(0);
   const [longUser, setLongUser] = useState(0);
+  const MINUTES_MS = 60000; // 10 Minuten
 
   useEffect(() => {
     parkingAreaDb.transaction((tx) => {
@@ -56,15 +58,95 @@ export default function App() {
           );
         }
       });
+      tx.executeSql(
+        "create table if not exists parkingdetails (id integer primary key not null, parkingAreaId number, numberOfLots number, numberOfTakenLots number, numberofFreeLots number, trend number, status string, closed number, dateOfData string);"
+      );
     });
   }, []);
 
-  useEffect(() => {
-    detailsDb.transaction((tx) => {
+  function getData() {
+    fetch("http://parken.amberg.de/wp-content/uploads/pls/pls.xml")
+      .then((response) => response.text())
+      .then((textResponse) => {
+        const parser = new XMLParser();
+        let obj = parser.parse(textResponse);
+        let dateOfData = obj.Daten.Zeitstempel;
+        for (const elem of obj.Daten.Parkhaus) {
+          elem.Name = decode(elem.Name, { level: "xml" });
+          insertIntoDetailsTable(
+            elem.Name,
+            dateOfData,
+            elem.Gesamt,
+            elem.Aktuell,
+            elem.Frei,
+            elem.Trend,
+            elem.Status,
+            elem.Geschlossen
+          );
+        }
+      })
+      .catch((error) => {
+        Alert.alert(
+          "Warnung!",
+          "Die aktuellen Parkhausdaten konnten nicht abgerufen werden. Bitte Internetverbindung prüfen!"
+        );
+        console.error(error);
+      });
+  }
+
+  const insertIntoDetailsTable = (
+    name: string,
+    dateOfData: string,
+    numberOfLots: number,
+    numberOfTakenLots: number,
+    numberOfFreeLots: number,
+    trend: number,
+    status: string,
+    closed: number
+  ) => {
+    let id = 0;
+    parkingAreaDb.transaction((tx) => {
       tx.executeSql(
-        "create table if not exists parkingarea (id integer primary key not null, parkingAreaId number, numberOfLots number, numberOfTakenLots number, numberofFreeLots number, trend number, status string, closed number, dateOfData datetime);"
+        "select id from parkingarea where name = ?",
+        [name],
+        (_, { rows }) => (id = rows._array[0]["id"])
       );
     });
+    parkingAreaDb.transaction((tx) => {
+      tx.executeSql(
+        "insert into parkingdetails (parkingAreaId, numberOfLots, numberOfTakenLots, numberofFreeLots, trend, status, closed, dateOfData) values (?, ?, ?, ?, ?, ?, ?, ?)",
+        [
+          id,
+          numberOfLots,
+          numberOfTakenLots,
+          numberOfFreeLots,
+          trend,
+          status,
+          closed,
+          dateOfData,
+        ]
+      );
+      tx.executeSql(
+        "select * from parkingdetails where parkingAreaId = ? order by dateOfData desc",
+        [id],
+        (_, { rows }) => {
+          if (rows.length >= 2) {
+            tx.executeSql("delete from parkingdetails where name = ? limit 1", [
+              name,
+            ]);
+          }
+        }
+      );
+    });
+  };
+
+  useEffect(() => {
+    const intervalCall = setInterval(() => {
+      getData();
+    }, MINUTES_MS);
+    return () => {
+      clearInterval(intervalCall);
+    };
   }, []);
 
   const getParkingAreaId = (id: number) => {

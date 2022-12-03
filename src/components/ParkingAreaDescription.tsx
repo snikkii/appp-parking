@@ -1,4 +1,3 @@
-import { StatusBar } from "expo-status-bar";
 import {
   StyleSheet,
   Dimensions,
@@ -6,7 +5,6 @@ import {
   View,
   TouchableOpacity,
 } from "react-native";
-import { IParkingArea } from "../models/IParkingArea";
 import * as SQLite from "expo-sqlite";
 import { useState } from "react";
 
@@ -40,6 +38,14 @@ export default function ParkingAreaDescription(props: IParkingAreaDescription) {
   const [longParkingArea, setLongParkingArea] = useState(0);
   const [latParkingArea, setLatParkingArea] = useState(0);
 
+  const [numberOfLots, setNumberOfLots] = useState(0);
+  const [numberOfTakenLots, setNumberOfTakenLots] = useState(0);
+  const [numberofFreeLots, setNumberofFreeLots] = useState(0);
+  const [trend, setTrend] = useState(0);
+  const [status, setStatus] = useState("");
+  const [closed, setClosed] = useState(0);
+  const [dateOfData, setDateOfData] = useState("");
+
   parkingAreaDb.transaction((tx) => {
     tx.executeSql(
       "select * from parkingarea where id = ?",
@@ -53,6 +59,24 @@ export default function ParkingAreaDescription(props: IParkingAreaDescription) {
         setLatParkingArea(rows._array[0]["lat"]),
         setLongParkingArea(rows._array[0]["long"])
       )
+    );
+  });
+
+  parkingAreaDb.transaction((tx) => {
+    tx.executeSql(
+      "select * from parkingdetails where parkingAreaId = ?",
+      [id],
+      (_, { rows }) => {
+        if (rows.length != 0) {
+          setNumberOfLots(rows._array[0]["numberOfLots"]);
+          setNumberOfTakenLots(rows._array[0]["numberOfTakenLots"]);
+          setNumberofFreeLots(rows._array[0]["numberofFreeLots"]);
+          setTrend(rows._array[0]["trend"]);
+          setStatus(rows._array[0]["status"]);
+          setClosed(rows._array[0]["closed"]);
+          setDateOfData(rows._array[0]["dateOfData"]);
+        }
+      }
     );
   });
 
@@ -76,6 +100,14 @@ export default function ParkingAreaDescription(props: IParkingAreaDescription) {
       </Text>
       <Text style={styles.text}>
         LatU: {latUser}, LongU: {longUser}
+      </Text>
+      <Text style={styles.text}>
+        Gesamt: {numberOfLots}, Belegt: {numberOfTakenLots}, Frei:
+        {numberofFreeLots}
+      </Text>
+      <Text style={styles.text}>
+        Trend: {trend}, Status: {status}, Geschlossen: {closed}, Datum:
+        {dateOfData}
       </Text>
     </View>
   );

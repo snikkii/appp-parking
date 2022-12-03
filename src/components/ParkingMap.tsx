@@ -1,19 +1,10 @@
-import { StatusBar } from "expo-status-bar";
 import MapView, { Marker } from "react-native-maps";
-import {
-  StyleSheet,
-  Dimensions,
-  View,
-  StyleProp,
-  StyleSheetProperties,
-  ViewStyle,
-} from "react-native";
+import { View, StyleProp, ViewStyle } from "react-native";
 import { useEffect, useState } from "react";
 import * as Location from "expo-location";
 import { allParkingAreas } from "../AllParkingAreas";
 import { IParkingArea } from "../models/IParkingArea";
 import * as SQLite from "expo-sqlite";
-import ParkingAreaDescription from "./ParkingAreaDescription";
 
 interface IParkingMapProps {
   parkingAreaDb:
@@ -49,7 +40,6 @@ export function ParkingMap(props: IParkingMapProps) {
         setErrorMsg("Permission to access location was denied");
         return;
       }
-
       let location = await Location.getCurrentPositionAsync({});
       setLocation(location);
     })();
@@ -75,11 +65,6 @@ export function ParkingMap(props: IParkingMapProps) {
   return (
     <View>
       <MapView
-        // style={
-        //   showParkingAreaDescriptionStyle
-        //     ? styles.mapWithDescription
-        //     : styles.map
-        // }
         style={mapStyle}
         showsUserLocation
         region={
@@ -103,52 +88,24 @@ export function ParkingMap(props: IParkingMapProps) {
               longitude: parkingArea.long,
             }}
             title={parkingArea.name}
-            onPress={() =>
-              parkingAreaDb.transaction((tx) => {
+            onPress={() => {
+              parkingAreaDb.transaction((tx) =>
                 tx.executeSql(
                   "select * from parkingarea where id = ?",
                   [parkingArea.id],
                   (_, { rows }) =>
-                    // setShowParkingAreaDescription(true),
                     showParkingAreaDescription(
                       rows._array[0]["id"],
                       true,
                       location?.coords.latitude,
                       location?.coords.longitude
                     )
-                  // setParkingAreaId(rows._array[0]["id"]),
-                  // setParkingAreaInfos([
-                  //   rows._array[0]["name"],
-                  //   rows._array[0]["openingHours"],
-                  //   rows._array[0]["pricePerHour"],
-                  //   rows._array[0]["doorHeight"],
-                  // ]),
-                  // setParkingAreaFavorit(rows._array[0]["favorite"]),
-                  // setParkingAreaLatLong([
-                  //   rows._array[0]["lat"],
-                  //   rows._array[0]["long"],
-                  // ])
-                  // console.log(JSON.stringify(rows._array[0]["name"]))
-                );
-              })
-            }
+                )
+              );
+            }}
           />
         ))}
       </MapView>
-      {/* {showParkingAreaDescription ? (
-        <ParkingAreaDescription
-          id={parkingAreaId}
-          name={parkingAreaInfos[0]}
-          openingHours={parkingAreaInfos[1]}
-          pricePerHour={parkingAreaInfos[2]}
-          doorHeight={parkingAreaInfos[3]}
-          favorite={parkingAreaFavorit}
-          latParkingArea={parkingAreaLatLong[0]}
-          longParkingArea={parkingAreaLatLong[1]}
-          latUser={location ? location.coords.latitude : 0}
-          longUser={location ? location.coords.longitude : 0}
-        />
-      ) : undefined} */}
     </View>
   );
 }
