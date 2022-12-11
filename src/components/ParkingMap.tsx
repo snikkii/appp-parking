@@ -4,16 +4,8 @@ import { useEffect, useState } from "react";
 import * as Location from "expo-location";
 import { allParkingAreas } from "../AllParkingAreas";
 import { IParkingArea } from "../models/IParkingArea";
-import * as SQLite from "expo-sqlite";
 
 interface IParkingMapProps {
-  parkingAreaDb:
-    | SQLite.WebSQLDatabase
-    | {
-        transaction: () => {
-          executeSql: () => void;
-        };
-      };
   handleParkingAreaId(id: number): void;
   handleParkingAreaDescription(parkingAreaDescription: boolean): void;
   handleUserPosition(latUser?: number, longUser?: number): void;
@@ -22,7 +14,6 @@ interface IParkingMapProps {
 
 export function ParkingMap(props: IParkingMapProps) {
   const {
-    parkingAreaDb,
     handleParkingAreaId,
     handleParkingAreaDescription,
     handleUserPosition,
@@ -89,18 +80,11 @@ export function ParkingMap(props: IParkingMapProps) {
             }}
             title={parkingArea.name}
             onPress={() => {
-              parkingAreaDb.transaction((tx) =>
-                tx.executeSql(
-                  "select * from parkingarea where id = ?",
-                  [parkingArea.id],
-                  (_, { rows }) =>
-                    showParkingAreaDescription(
-                      rows._array[0]["id"],
-                      true,
-                      location?.coords.latitude,
-                      location?.coords.longitude
-                    )
-                )
+              showParkingAreaDescription(
+                parkingArea.id,
+                true,
+                location?.coords.latitude,
+                location?.coords.longitude
               );
             }}
           />
