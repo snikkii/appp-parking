@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import * as Location from "expo-location";
 import { allParkingAreas } from "../AllParkingAreas";
 import { IParkingArea } from "../models/IParkingArea";
+import { MaterialIcons } from "@expo/vector-icons";
 
 interface IParkingMapProps {
   handleParkingAreaId(id: number): void;
@@ -87,7 +88,14 @@ export function ParkingMap(props: IParkingMapProps) {
                 location?.coords.longitude
               );
             }}
-          />
+          >
+            <MaterialIcons
+              name="location-on"
+              size={50}
+              color="#005b60"
+              backgroundColor="transparent"
+            />
+          </Marker>
         ))}
       </MapView>
     </View>

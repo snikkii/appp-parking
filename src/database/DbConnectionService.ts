@@ -37,6 +37,7 @@ export class DbConnectionService {
     this.parkingAreaDb.transaction(
       (tx) => {
         // tx.executeSql("drop table parkingdetails");
+        // tx.executeSql("drop table parkingarea");
         tx.executeSql(
           "create table if not exists parkingarea (id integer primary key not null, name string, adress string, openingHours string, pricePerHour string, doorHeight string, favorite boolean, lat number, long number);"
         );
