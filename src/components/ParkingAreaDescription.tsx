@@ -4,6 +4,7 @@ import {
   Text,
   View,
   TouchableOpacity,
+  Alert,
 } from "react-native";
 import { useEffect, useState } from "react";
 import { DbConnectionService } from "../database/DbConnectionService";
@@ -31,8 +32,8 @@ export default function ParkingAreaDescription(props: IParkingAreaDescription) {
   const [parkingAreaDetailsData, setParkingAreaDetailsData] = useState(
     {} as IParkingAreaDetails
   );
-  const [favorite, setFavorite] = useState(false);
   const [databaseError, setDatabaseError] = useState(false);
+  const [favorite, setFavorite] = useState(false);
 
   const fetchDataFromTable = async () => {
     try {
@@ -47,16 +48,31 @@ export default function ParkingAreaDescription(props: IParkingAreaDescription) {
 
       setParkingAreaData(parkingAreas);
       setParkingAreaDetailsData(parkingAreaDetails);
+
+      // setFavorite(parkingAreaData.favorite);
       setDatabaseError(false);
+
+      if (parkingAreaDetails.dateOfData == "keine Daten") {
+        Alert.alert("Warnung!", "Es konnten keine Daten gefunden werden.");
+        showParkingAreaDescription(false);
+      }
     } catch (error) {
       console.error(error);
       setDatabaseError(true);
     }
   };
 
+  const setFavoriteParkingArea = (favorite: boolean, name: string) => {
+    dbConnectionService.setFavoriteParkingArea(favorite, name);
+    setFavorite(favorite);
+  };
+
   useEffect(() => {
     fetchDataFromTable();
-  }, [id, databaseError]);
+    console.log("hi " + parkingAreaData.favorite);
+    setFavorite(parkingAreaData.favorite);
+    console.log(favorite);
+  }, [id, favorite]);
 
   const showParkingAreaDescription = (showDescription: boolean) => {
     handleShowParkingAreaDescription(showDescription);
@@ -95,23 +111,29 @@ export default function ParkingAreaDescription(props: IParkingAreaDescription) {
           <View style={styles.headingContainer}>
             <View style={styles.nameContainer}>
               <Text style={styles.heading}>{parkingAreaData.name}</Text>
-              {favorite ? (
+              <Text style={styles.heading}>{parkingAreaData.favorite}</Text>
+
+              {favorite == true ? (
                 <Ionicons.Button
                   style={styles.favoriteIcons}
                   name="ios-heart"
                   size={25}
-                  color="#fff"
+                  color="#a66378"
                   backgroundColor="transparent"
-                  onPress={() => setFavorite(false)}
+                  onPress={() =>
+                    setFavoriteParkingArea(false, parkingAreaData.name)
+                  }
                 />
               ) : (
                 <Ionicons.Button
                   style={styles.favoriteIcons}
                   name="ios-heart-outline"
                   size={25}
-                  color="#fff"
+                  color="#a66378"
                   backgroundColor="transparent"
-                  onPress={() => setFavorite(true)}
+                  onPress={() =>
+                    setFavoriteParkingArea(true, parkingAreaData.name)
+                  }
                 />
               )}
             </View>

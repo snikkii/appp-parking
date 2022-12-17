@@ -52,7 +52,7 @@ export class DbConnectionService {
                   parkingArea.openingHours,
                   parkingArea.pricePerHour,
                   parkingArea.doorHeight,
-                  "false",
+                  parkingArea.favorite.toString(),
                   parkingArea.lat,
                   parkingArea.long,
                 ]
@@ -230,16 +230,26 @@ export class DbConnectionService {
             "select * from parkingdetails where parkingAreaId = ? order by dateOfData desc limit 1",
             [parkingAreaId],
             (tx, result) => {
-              parkingAreaDetails.numberOfLots =
-                result.rows.item(0).numberOfLots;
-              parkingAreaDetails.numberOfTakenLots =
-                result.rows.item(0).numberOfTakenLots;
-              parkingAreaDetails.numberOfFreeLots =
-                result.rows.item(0).numberOfFreeLots;
-              parkingAreaDetails.trend = result.rows.item(0).trend;
-              parkingAreaDetails.status = result.rows.item(0).status;
-              parkingAreaDetails.closed = result.rows.item(0).closed;
-              parkingAreaDetails.dateOfData = result.rows.item(0).dateOfData;
+              if (result.rows.length > 0) {
+                parkingAreaDetails.numberOfLots =
+                  result.rows.item(0).numberOfLots;
+                parkingAreaDetails.numberOfTakenLots =
+                  result.rows.item(0).numberOfTakenLots;
+                parkingAreaDetails.numberOfFreeLots =
+                  result.rows.item(0).numberOfFreeLots;
+                parkingAreaDetails.trend = result.rows.item(0).trend;
+                parkingAreaDetails.status = result.rows.item(0).status;
+                parkingAreaDetails.closed = result.rows.item(0).closed;
+                parkingAreaDetails.dateOfData = result.rows.item(0).dateOfData;
+              } else {
+                parkingAreaDetails.numberOfLots = 0;
+                parkingAreaDetails.numberOfTakenLots = 0;
+                parkingAreaDetails.numberOfFreeLots = 0;
+                parkingAreaDetails.trend = 0;
+                parkingAreaDetails.status = "OK";
+                parkingAreaDetails.closed = 0;
+                parkingAreaDetails.dateOfData = "keine Daten";
+              }
               resolve(parkingAreaDetails);
             }
           );
@@ -268,5 +278,20 @@ export class DbConnectionService {
         }
       );
     });
+  };
+
+  public setFavoriteParkingArea = (favorite: boolean, name: string) => {
+    this.parkingAreaDb.transaction(
+      (tx) => {
+        tx.executeSql(
+          "update parkingarea set favorite = ? where name = ?",
+          [favorite.toString(), name],
+          (tx, result) => {}
+        );
+      },
+      (error) => {
+        console.error(error);
+      }
+    );
   };
 }

@@ -19,6 +19,7 @@ export default function App() {
 
   useEffect(() => {
     dbConnectionService.createTables();
+    dbConnectionService.getData();
   }, []);
 
   useEffect(() => {
