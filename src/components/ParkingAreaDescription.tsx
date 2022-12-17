@@ -27,23 +27,31 @@ export default function ParkingAreaDescription(props: IParkingAreaDescription) {
     {} as IParkingAreaDetails
   );
   const [favorite, setFavorite] = useState(false);
+  const [databaseError, setDatabaseError] = useState(false);
 
   const fetchDataFromTable = async () => {
-    setParkingAreaData(
-      (await dbConnectionService.getDataFromParkingAreaTable(
+    try {
+      let parkingAreas = (await dbConnectionService.getDataFromParkingAreaTable(
         id
-      )) as IParkingArea
-    );
-    setParkingAreaDetailsData(
-      (await dbConnectionService.getDataFromParkingAreaDetailsTable(
-        id
-      )) as IParkingAreaDetails
-    );
+      )) as IParkingArea;
+
+      let parkingAreaDetails =
+        (await dbConnectionService.getDataFromParkingAreaDetailsTable(
+          id
+        )) as IParkingAreaDetails;
+
+      setParkingAreaData(parkingAreas);
+      setParkingAreaDetailsData(parkingAreaDetails);
+      setDatabaseError(false);
+    } catch (error) {
+      console.error(error);
+      setDatabaseError(true);
+    }
   };
 
   useEffect(() => {
     fetchDataFromTable();
-  }, [id]);
+  }, [id, databaseError]);
 
   const showParkingAreaDescription = (showDescription: boolean) => {
     handleShowParkingAreaDescription(showDescription);
@@ -51,117 +59,129 @@ export default function ParkingAreaDescription(props: IParkingAreaDescription) {
 
   return (
     <View style={styles.container}>
-      <View style={styles.headingContainer}>
-        <View style={styles.nameContainer}>
-          <Text style={styles.heading}>{parkingAreaData.name}</Text>
-          {favorite ? (
+      {databaseError ? (
+        <View style={styles.warningContainer}>
+          <View style={styles.headingContainer}>
+            <View style={styles.nameContainer}>
+              <Text style={styles.heading}>Achtung!</Text>
+              <Ionicons.Button
+                style={styles.favoriteIcons}
+                name="ios-warning"
+                size={25}
+                color="#fff"
+                backgroundColor="transparent"
+              />
+            </View>
             <Ionicons.Button
-              style={styles.favoriteIcons}
-              name="ios-heart"
-              size={25}
+              style={styles.headingIcon}
+              name="close-circle"
+              size={30}
               color="#fff"
               backgroundColor="transparent"
-              onPress={() => setFavorite(false)}
+              onPress={() => showParkingAreaDescription(false)}
             />
-          ) : (
-            <Ionicons.Button
-              style={styles.favoriteIcons}
-              name="ios-heart-outline"
-              size={25}
-              color="#fff"
-              backgroundColor="transparent"
-              onPress={() => setFavorite(true)}
-            />
-          )}
-          {/* {favorite ? (
-            <Ionicons.Button
-              style={styles.favoriteIcons}
-              name="star-sharp"
-              size={25}
-              color="#fff"
-              backgroundColor="transparent"
-              onPress={() => setFavorite(false)}
-            />
-          ) : (
-            <Ionicons.Button
-              style={styles.favoriteIcons}
-              name="star-outline"
-              size={25}
-              color="#fff"
-              backgroundColor="transparent"
-              onPress={() => setFavorite(true)}
-            />
-          )} */}
+          </View>
+          <Text style={styles.text}>
+            Die Daten konnten nicht abgerufen werden. Aktion bitte wiederholen!
+          </Text>
         </View>
-        <Ionicons.Button
-          style={styles.headingIcon}
-          name="close-circle"
-          size={30}
-          color="#fff"
-          backgroundColor="transparent"
-          onPress={() => showParkingAreaDescription(false)}
-        />
-      </View>
-      <Text style={styles.text}>
-        <Ionicons
-          name="ios-time"
-          size={20}
-          color="#fff"
-          backgroundColor="transparent"
-        />
-        Stunden: {parkingAreaData.openingHours}
-      </Text>
-      <Text style={styles.text}>
-        <MaterialIcons
-          name="height"
-          size={20}
-          color="#fff"
-          backgroundColor="transparent"
-        />
-        Höhe: {parkingAreaData.doorHeight}, Favorit: {parkingAreaData.favorite},
-        <MaterialIcons
-          name="euro"
-          size={20}
-          color="#fff"
-          backgroundColor="transparent"
-        />
-        Preis: {parkingAreaData.pricePerHour}
-      </Text>
-      <Text style={styles.text}>
-        LatP: {parkingAreaData.lat}, LongP: {parkingAreaData.long}
-      </Text>
-      <Text style={styles.text}>
-        LatU: {latUser}, LongU: {longUser}
-      </Text>
-      <Text style={styles.text}>
-        <MaterialIcons
-          name="trending-down"
-          size={20}
-          color="#fff"
-          backgroundColor="transparent"
-        />
-        <MaterialIcons
-          name="trending-neutral"
-          size={20}
-          color="#fff"
-          backgroundColor="transparent"
-        />
-        <MaterialIcons
-          name="trending-up"
-          size={20}
-          color="#fff"
-          backgroundColor="transparent"
-        />
-        Gesamt: {parkingAreaDetailsData.numberOfLots}, Belegt:{" "}
-        {parkingAreaDetailsData.numberOfTakenLots}, Frei:
-        {parkingAreaDetailsData.numberOfFreeLots}
-      </Text>
-      <Text style={styles.text}>
-        Trend: {parkingAreaDetailsData.trend}, Status:{" "}
-        {parkingAreaDetailsData.status}, Geschlossen:{" "}
-        {parkingAreaDetailsData.closed}, Datum:
-        {parkingAreaDetailsData.dateOfData}
-      </Text>
+      ) : (
+        <View style={styles.container}>
+          <View style={styles.headingContainer}>
+            <View style={styles.nameContainer}>
+              <Text style={styles.heading}>{parkingAreaData.name}</Text>
+              {favorite ? (
+                <Ionicons.Button
+                  style={styles.favoriteIcons}
+                  name="ios-heart"
+                  size={25}
+                  color="#fff"
+                  backgroundColor="transparent"
+                  onPress={() => setFavorite(false)}
+                />
+              ) : (
+                <Ionicons.Button
+                  style={styles.favoriteIcons}
+                  name="ios-heart-outline"
+                  size={25}
+                  color="#fff"
+                  backgroundColor="transparent"
+                  onPress={() => setFavorite(true)}
+                />
+              )}
+            </View>
+            <Ionicons.Button
+              style={styles.headingIcon}
+              name="close-circle"
+              size={30}
+              color="#fff"
+              backgroundColor="transparent"
+              onPress={() => showParkingAreaDescription(false)}
+            />
+          </View>
+          <Text style={styles.text}>
+            <Ionicons
+              name="ios-time"
+              size={20}
+              color="#fff"
+              backgroundColor="transparent"
+            />
+            Stunden: {parkingAreaData.openingHours}
+          </Text>
+          <Text style={styles.text}>
+            <MaterialIcons
+              name="height"
+              size={20}
+              color="#fff"
+              backgroundColor="transparent"
+            />
+            Höhe: {parkingAreaData.doorHeight}, Favorit:{" "}
+            {parkingAreaData.favorite},
+            <MaterialIcons
+              name="euro"
+              size={20}
+              color="#fff"
+              backgroundColor="transparent"
+            />
+            Preis: {parkingAreaData.pricePerHour}
+          </Text>
+          <Text style={styles.text}>
+            LatP: {parkingAreaData.lat}, LongP: {parkingAreaData.long}
+          </Text>
+          <Text style={styles.text}>
+            LatU: {latUser}, LongU: {longUser}
+          </Text>
+          <Text style={styles.text}>
+            <MaterialIcons
+              name="trending-down"
+              size={20}
+              color="#fff"
+              backgroundColor="transparent"
+            />
+            <MaterialIcons
+              name="trending-neutral"
+              size={20}
+              color="#fff"
+              backgroundColor="transparent"
+            />
+            <MaterialIcons
+              name="trending-up"
+              size={20}
+              color="#fff"
+              backgroundColor="transparent"
+            />
+            Gesamt: {parkingAreaDetailsData.numberOfLots}, Belegt:{" "}
+            {parkingAreaDetailsData.numberOfTakenLots}, Frei:
+            {parkingAreaDetailsData.numberOfFreeLots}
+          </Text>
+          <Text style={styles.text}>
+            Trend: {parkingAreaDetailsData.trend}, Status:{" "}
+            {parkingAreaDetailsData.status}, Geschlossen:{" "}
+            {parkingAreaDetailsData.closed}, Datum:
+            {parkingAreaDetailsData.dateOfData}
+          </Text>
+        </View>
+      )}
     </View>
   );
 }
@@ -170,6 +190,13 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#2e2d2d",
+    alignItems: "center",
+    justifyContent: "flex-start",
+    height: Dimensions.get("window").height * 0.3,
+  },
+  warningContainer: {
+    flex: 1,
+    backgroundColor: "#fd526c",
     alignItems: "center",
     justifyContent: "flex-start",
     height: Dimensions.get("window").height * 0.3,

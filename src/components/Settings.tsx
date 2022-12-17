@@ -5,6 +5,7 @@ import {
   View,
   TouchableOpacity,
   FlatList,
+  Alert,
 } from "react-native";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { useEffect, useState } from "react";
@@ -28,15 +29,23 @@ export default function Settings(props: ISettings) {
   const [parkingAreaRows, setParkingAreaRows] = useState(
     {} as SQLite.SQLResultSetRowList
   );
+  const [databaseError, setDatabaseError] = useState(false);
+
   const fetchDataFromTable = async () => {
-    setParkingAreaRows(
-      (await dbConnectionService.getParkingAreas()) as SQLite.SQLResultSetRowList
-    );
+    try {
+      let parkingAreas =
+        (await dbConnectionService.getParkingAreas()) as SQLite.SQLResultSetRowList;
+      setParkingAreaRows(parkingAreas);
+      setDatabaseError(false);
+    } catch (error) {
+      console.error(error);
+      setDatabaseError(true);
+    }
   };
 
   useEffect(() => {
     fetchDataFromTable();
-  }, [collapsParkingAreas]);
+  }, [collapsParkingAreas, databaseError]);
 
   const showSettings = (show: boolean) => {
     handleShowSettings(show);
@@ -119,7 +128,7 @@ export default function Settings(props: ISettings) {
           </TouchableOpacity>
         )}
 
-        {collapsParkingAreas ? (
+        {collapsParkingAreas && !databaseError ? (
           <FlatList
             style={styles.parkingList}
             data={parkingAreaRows._array}
@@ -133,6 +142,21 @@ export default function Settings(props: ISettings) {
               </View>
             )}
           />
+        ) : undefined}
+        {databaseError && collapsParkingAreas ? (
+          <View style={styles.warnItem}>
+            <Text style={styles.warnText}>
+              Die Parkhäuser können aktuell nicht angezeigt werden. App bitte
+              neu starten!
+            </Text>
+            <Ionicons.Button
+              style={styles.icons}
+              name="ios-warning"
+              size={40}
+              color="#2e2d2d"
+              backgroundColor="transparent"
+            />
+          </View>
         ) : undefined}
       </View>
     </View>
@@ -237,5 +261,24 @@ const styles = StyleSheet.create({
     color: "#2e2d2d",
     fontSize: 20,
     alignItems: "center",
+  },
+  warnText: {
+    flexWrap: "wrap",
+    flexDirection: "row",
+    margin: 10,
+    color: "#2e2d2d",
+    fontSize: 16,
+  },
+  warnItem: {
+    flexDirection: "row",
+    width: Dimensions.get("window").width * 0.9,
+    height: Dimensions.get("window").height * 0.1,
+    borderColor: "#fd526c",
+    backgroundColor: "#fd526c",
+    borderWidth: 2,
+    borderRadius: 10,
+    margin: 5,
+    padding: 10,
+    justifyContent: "center",
   },
 });

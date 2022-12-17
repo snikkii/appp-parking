@@ -34,34 +34,43 @@ export class DbConnectionService {
   };
 
   public createTables = () => {
-    this.parkingAreaDb.transaction((tx) => {
-      // tx.executeSql("drop table parkingdetails");
-      tx.executeSql(
-        "create table if not exists parkingarea (id integer primary key not null, name string, adress string, openingHours string, pricePerHour string, doorHeight string, favorite boolean, lat number, long number);"
-      );
-      tx.executeSql("select * from parkingarea", [], (_, { rows }) => {
-        if (rows.length == 0) {
-          allParkingAreas.map((parkingArea: IParkingArea) =>
-            tx.executeSql(
-              "insert into parkingarea (name, adress, openingHours, pricePerHour, doorHeight, favorite, lat, long) values (?, ?, ?, ?, ?, ?, ?, ?)",
-              [
-                parkingArea.name,
-                parkingArea.adress,
-                parkingArea.openingHours,
-                parkingArea.pricePerHour,
-                parkingArea.doorHeight,
-                "false",
-                parkingArea.lat,
-                parkingArea.long,
-              ]
-            )
-          );
-        }
-      });
-      tx.executeSql(
-        "create table if not exists parkingdetails (id integer primary key not null, parkingAreaId number, numberOfLots number, numberOfTakenLots number, numberOfFreeLots number, trend number, status string, closed number, dateOfData string);"
-      );
-    });
+    this.parkingAreaDb.transaction(
+      (tx) => {
+        // tx.executeSql("drop table parkingdetails");
+        tx.executeSql(
+          "create table if not exists parkingarea (id integer primary key not null, name string, adress string, openingHours string, pricePerHour string, doorHeight string, favorite boolean, lat number, long number);"
+        );
+        tx.executeSql("select * from parkingarea", [], (_, { rows }) => {
+          if (rows.length == 0) {
+            allParkingAreas.map((parkingArea: IParkingArea) =>
+              tx.executeSql(
+                "insert into parkingarea (name, adress, openingHours, pricePerHour, doorHeight, favorite, lat, long) values (?, ?, ?, ?, ?, ?, ?, ?)",
+                [
+                  parkingArea.name,
+                  parkingArea.adress,
+                  parkingArea.openingHours,
+                  parkingArea.pricePerHour,
+                  parkingArea.doorHeight,
+                  "false",
+                  parkingArea.lat,
+                  parkingArea.long,
+                ]
+              )
+            );
+          }
+        });
+        tx.executeSql(
+          "create table if not exists parkingdetails (id integer primary key not null, parkingAreaId number, numberOfLots number, numberOfTakenLots number, numberOfFreeLots number, trend number, status string, closed number, dateOfData string);"
+        );
+      },
+      (error) => {
+        console.error(error);
+        Alert.alert(
+          "Warnung!",
+          "Es gab ein Problem mit der Datenbank. Bitte App neu starten!"
+        );
+      }
+    );
   };
 
   public getData = () => {
@@ -71,6 +80,7 @@ export class DbConnectionService {
         const parser = new XMLParser();
         let obj = parser.parse(textResponse);
         let dateOfData = obj.Daten.Zeitstempel;
+        let ctr = 0;
         for (const elem of obj.Daten.Parkhaus) {
           elem.Name = decode(elem.Name, { level: "xml" });
           this.insertIntoDetailsTable(
@@ -81,16 +91,18 @@ export class DbConnectionService {
             elem.Frei,
             elem.Trend,
             elem.Status,
-            elem.Geschlossen
+            elem.Geschlossen,
+            ctr
           );
+          ctr += 1;
         }
       })
       .catch((error) => {
+        console.error(error);
         Alert.alert(
           "Warnung!",
           "Die aktuellen Parkhausdaten konnten nicht abgerufen werden. Bitte Internetverbindung prüfen!"
         );
-        console.error(error);
       });
   };
 
@@ -102,106 +114,158 @@ export class DbConnectionService {
     numberOfFreeLots: number,
     trend: number,
     status: string,
-    closed: number
+    closed: number,
+    ctr: number
   ) => {
     let id = 0;
     let toDelete = "";
-    this.parkingAreaDb.transaction((tx) => {
-      tx.executeSql(
-        "select id from parkingarea where name = ?",
-        [name],
-        (_, { rows }) => (id = rows._array[0]["id"])
-      );
-    });
-    this.parkingAreaDb.transaction((tx) => {
-      tx.executeSql(
-        "insert into parkingdetails (parkingAreaId, numberOfLots, numberOfTakenLots, numberOfFreeLots, trend, status, closed, dateOfData) values (?, ?, ?, ?, ?, ?, ?, ?)",
-        [
-          id,
-          numberOfLots,
-          numberOfTakenLots,
-          numberOfFreeLots,
-          trend,
-          status,
-          closed,
-          dateOfData,
-        ]
-      );
-      tx.executeSql(
-        "select * from parkingdetails where parkingAreaId = ? order by dateOfData asc",
-        [id],
-        (_, { rows }) => {
-          if (rows.length >= 4) {
-            toDelete = rows._array[0]["dateOfData"];
-          }
+    this.parkingAreaDb.transaction(
+      (tx) => {
+        tx.executeSql(
+          "select id from parkingarea where name = ?",
+          [name],
+          (_, { rows }) => (id = rows._array[0]["id"])
+        );
+      },
+      (error) => {
+        console.error(error);
+        if (ctr == 1) {
+          Alert.alert(
+            "Warnung!",
+            "Es gab ein Problem mit der Datenbank. Bitte App neu starten!"
+          );
         }
-      );
-    });
-    this.parkingAreaDb.transaction((tx) => {
-      tx.executeSql(
-        "delete from parkingdetails where parkingAreaId = ? and dateOfData = ?",
-        [id, toDelete]
-      );
-    });
+      }
+    );
+    this.parkingAreaDb.transaction(
+      (tx) => {
+        tx.executeSql(
+          "insert into parkingdetails (parkingAreaId, numberOfLots, numberOfTakenLots, numberOfFreeLots, trend, status, closed, dateOfData) values (?, ?, ?, ?, ?, ?, ?, ?)",
+          [
+            id,
+            numberOfLots,
+            numberOfTakenLots,
+            numberOfFreeLots,
+            trend,
+            status,
+            closed,
+            dateOfData,
+          ]
+        );
+        tx.executeSql(
+          "select * from parkingdetails where parkingAreaId = ? order by dateOfData asc",
+          [id],
+          (_, { rows }) => {
+            if (rows.length >= 4) {
+              toDelete = rows._array[0]["dateOfData"];
+            }
+          }
+        );
+      },
+      (error) => {
+        console.error(error);
+        if (ctr == 1) {
+          Alert.alert(
+            "Warnung!",
+            "Es gab ein Problem mit der Datenbank. Bitte App neu starten!"
+          );
+        }
+      }
+    );
+    this.parkingAreaDb.transaction(
+      (tx) => {
+        tx.executeSql(
+          "delete from parkingdetails where parkingAreaId = ? and dateOfData = ?",
+          [id, toDelete]
+        );
+      },
+      (error) => {
+        console.error(error);
+        if (ctr == 1) {
+          Alert.alert(
+            "Warnung!",
+            "Es gab ein Problem mit der Datenbank. Bitte App neu starten!"
+          );
+        }
+      }
+    );
   };
 
   public getDataFromParkingAreaTable = async (parkingAreaId: number) => {
     let parkingAreaDetails = {} as IParkingArea;
     return new Promise((resolve, reject) => {
-      this.parkingAreaDb.transaction((tx) => {
-        tx.executeSql(
-          "select * from parkingarea where id = ?",
-          [parkingAreaId],
-          (tx, result) => {
-            parkingAreaDetails.name = result.rows.item(0).name;
-            parkingAreaDetails.openingHours = result.rows.item(0).openingHours;
-            parkingAreaDetails.pricePerHour = result.rows.item(0).pricePerHour;
-            parkingAreaDetails.doorHeight = result.rows.item(0).doorHeight;
-            parkingAreaDetails.favorite = result.rows.item(0).favorite;
-            parkingAreaDetails.lat = result.rows.item(0).lat;
-            parkingAreaDetails.long = result.rows.item(0).long;
-            resolve(parkingAreaDetails);
-          }
-        );
-      });
+      this.parkingAreaDb.transaction(
+        (tx) => {
+          tx.executeSql(
+            "select * from parkingarea where id = ?",
+            [parkingAreaId],
+            (tx, result) => {
+              parkingAreaDetails.name = result.rows.item(0).name;
+              parkingAreaDetails.openingHours =
+                result.rows.item(0).openingHours;
+              parkingAreaDetails.pricePerHour =
+                result.rows.item(0).pricePerHour;
+              parkingAreaDetails.doorHeight = result.rows.item(0).doorHeight;
+              parkingAreaDetails.favorite = result.rows.item(0).favorite;
+              parkingAreaDetails.lat = result.rows.item(0).lat;
+              parkingAreaDetails.long = result.rows.item(0).long;
+              resolve(parkingAreaDetails);
+            }
+          );
+        },
+        (error) => {
+          reject(error);
+        }
+      );
     });
   };
 
   public getDataFromParkingAreaDetailsTable = async (parkingAreaId: number) => {
     let parkingAreaDetails = {} as IParkingAreaDetails;
     return new Promise((resolve, reject) => {
-      this.parkingAreaDb.transaction((tx) => {
-        tx.executeSql(
-          "select * from parkingdetails where parkingAreaId = ? order by dateOfData desc limit 1",
-          [parkingAreaId],
-          (tx, result) => {
-            parkingAreaDetails.numberOfLots = result.rows.item(0).numberOfLots;
-            parkingAreaDetails.numberOfTakenLots =
-              result.rows.item(0).numberOfTakenLots;
-            parkingAreaDetails.numberOfFreeLots =
-              result.rows.item(0).numberOfFreeLots;
-            parkingAreaDetails.trend = result.rows.item(0).trend;
-            parkingAreaDetails.status = result.rows.item(0).status;
-            parkingAreaDetails.closed = result.rows.item(0).closed;
-            parkingAreaDetails.dateOfData = result.rows.item(0).dateOfData;
-            resolve(parkingAreaDetails);
-          }
-        );
-      });
+      this.parkingAreaDb.transaction(
+        (tx) => {
+          tx.executeSql(
+            "select * from parkingdetails where parkingAreaId = ? order by dateOfData desc limit 1",
+            [parkingAreaId],
+            (tx, result) => {
+              parkingAreaDetails.numberOfLots =
+                result.rows.item(0).numberOfLots;
+              parkingAreaDetails.numberOfTakenLots =
+                result.rows.item(0).numberOfTakenLots;
+              parkingAreaDetails.numberOfFreeLots =
+                result.rows.item(0).numberOfFreeLots;
+              parkingAreaDetails.trend = result.rows.item(0).trend;
+              parkingAreaDetails.status = result.rows.item(0).status;
+              parkingAreaDetails.closed = result.rows.item(0).closed;
+              parkingAreaDetails.dateOfData = result.rows.item(0).dateOfData;
+              resolve(parkingAreaDetails);
+            }
+          );
+        },
+        (error) => {
+          reject(error);
+        }
+      );
     });
   };
 
   public getParkingAreas = async () => {
     return new Promise((resolve, reject) => {
-      this.parkingAreaDb.transaction((tx) => {
-        tx.executeSql(
-          "select * from parkingarea order by name asc",
-          [],
-          (tx, result) => {
-            resolve(result.rows);
-          }
-        );
-      });
+      this.parkingAreaDb.transaction(
+        (tx) => {
+          tx.executeSql(
+            "select * from parkingarea order by name asc",
+            [],
+            (tx, result) => {
+              resolve(result.rows);
+            }
+          );
+        },
+        (error) => {
+          reject(error);
+        }
+      );
     });
   };
 }
