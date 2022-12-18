@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 import ParkingAreaDescription from "./src/components/ParkingAreaDescription";
 import ParkingAreaList from "./src/components/ParkingAreaList";
 import { DbConnectionService } from "./src/database/DbConnectionService";
-import Ionicons from "@expo/vector-icons/Ionicons";
+import { Ionicons, MaterialIcons } from "@expo/vector-icons";
 import ParkingAreaDetails from "./src/components/ParkingAreaDetails";
 
 const dbConnectionService = new DbConnectionService();

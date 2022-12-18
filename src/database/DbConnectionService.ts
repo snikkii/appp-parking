@@ -36,19 +36,19 @@ export class DbConnectionService {
   public createTables = () => {
     this.parkingAreaDb.transaction(
       (tx) => {
-        // tx.executeSql("drop table parkingdetails");
-        // tx.executeSql("drop table parkingarea");
+        tx.executeSql("drop table parkingdetails");
+        tx.executeSql("drop table parkingarea");
         tx.executeSql(
-          "create table if not exists parkingarea (id integer primary key not null, name string, adress string, openingHours string, pricePerHour string, doorHeight string, favorite number, lat number, long number);"
+          "create table if not exists parkingarea (id integer primary key not null, name string, address string, openingHours string, pricePerHour string, doorHeight string, favorite number, lat number, long number);"
         );
         tx.executeSql("select * from parkingarea", [], (_, { rows }) => {
           if (rows.length == 0) {
             allParkingAreas.map((parkingArea: IParkingArea) =>
               tx.executeSql(
-                "insert into parkingarea (name, adress, openingHours, pricePerHour, doorHeight, favorite, lat, long) values (?, ?, ?, ?, ?, ?, ?, ?)",
+                "insert into parkingarea (name, address, openingHours, pricePerHour, doorHeight, favorite, lat, long) values (?, ?, ?, ?, ?, ?, ?, ?)",
                 [
                   parkingArea.name,
-                  parkingArea.adress,
+                  parkingArea.address,
                   parkingArea.openingHours,
                   parkingArea.pricePerHour,
                   parkingArea.doorHeight,
@@ -202,6 +202,7 @@ export class DbConnectionService {
             [parkingAreaId],
             (tx, result) => {
               parkingAreaDetails.name = result.rows.item(0).name;
+              parkingAreaDetails.address = result.rows.item(0).address;
               parkingAreaDetails.openingHours =
                 result.rows.item(0).openingHours;
               parkingAreaDetails.pricePerHour =

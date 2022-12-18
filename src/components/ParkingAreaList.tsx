@@ -5,9 +5,8 @@ import {
   View,
   TouchableOpacity,
   FlatList,
-  Alert,
 } from "react-native";
-import Ionicons from "@expo/vector-icons/Ionicons";
+import { Ionicons } from "@expo/vector-icons";
 import { useEffect, useState } from "react";
 import { DbConnectionService } from "../database/DbConnectionService";
 import * as SQLite from "expo-sqlite";
@@ -28,7 +27,6 @@ export default function ParkingAreaList(props: IParkingAreaList) {
     handleParkingAreaDetails,
     handleSetId,
   } = props;
-  const [collapsParkingAreas, setCollapseParkingAreas] = useState(false);
   const [parkingAreaRows, setParkingAreaRows] = useState(
     {} as SQLite.SQLResultSetRowList
   );
@@ -53,7 +51,7 @@ export default function ParkingAreaList(props: IParkingAreaList) {
 
   useEffect(() => {
     fetchDataFromTable();
-  }, [collapsParkingAreas, databaseError]);
+  }, [handleParkingAreaDetails]);
 
   const showParkingAreaList = (show: boolean) => {
     handleShowParkingAreaList(show);

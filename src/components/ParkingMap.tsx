@@ -92,7 +92,7 @@ export function ParkingMap(props: IParkingMapProps) {
             <MaterialIcons
               name="location-on"
               size={50}
-              color="#005b60"
+              color="#00adad"
               backgroundColor="transparent"
             />
           </Marker>

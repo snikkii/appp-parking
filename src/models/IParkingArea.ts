@@ -1,7 +1,7 @@
 export interface IParkingArea {
   id: number;
   name: string;
-  adress: string;
+  address: string;
   openingHours: string;
   pricePerHour: string;
   doorHeight: string;

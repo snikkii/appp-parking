@@ -4,7 +4,7 @@ export const allParkingAreas: IParkingArea[] = [
   {
     id: 1,
     name: "Kurfürstengarage",
-    adress: "Schießstätteweg",
+    address: "Schießstätteweg",
     openingHours: "24",
     pricePerHour: "0,50",
     doorHeight: "2,10",
@@ -15,7 +15,7 @@ export const allParkingAreas: IParkingArea[] = [
   {
     id: 2,
     name: "Theatergarage",
-    adress: "Mühlgasse",
+    address: "Mühlgasse",
     openingHours: "24",
     pricePerHour: "1,00",
     doorHeight: "1,95",
@@ -26,7 +26,7 @@ export const allParkingAreas: IParkingArea[] = [
   {
     id: 3,
     name: "Kräuterwiese",
-    adress: "Sulzbacher Straße",
+    address: "Sulzbacher Straße",
     openingHours: "24",
     pricePerHour: "0,50",
     doorHeight: "2,05 - 2,15",
@@ -37,7 +37,7 @@ export const allParkingAreas: IParkingArea[] = [
   {
     id: 4,
     name: "Am Ziegeltor",
-    adress: "Pfalzgrafenring",
+    address: "Pfalzgrafenring",
     openingHours: "24",
     pricePerHour: "0,50",
     doorHeight: "2,10",
@@ -48,7 +48,7 @@ export const allParkingAreas: IParkingArea[] = [
   {
     id: 5,
     name: "Kurfürstenbad",
-    adress: "Am Anschluß",
+    address: "Am Anschluß",
     openingHours: "",
     pricePerHour: "",
     doorHeight: "",
@@ -59,7 +59,7 @@ export const allParkingAreas: IParkingArea[] = [
   {
     id: 6,
     name: "Kino",
-    adress: "Regensburger Straße oder Kaiser-Ludwig-Ring",
+    address: "Regensburger Straße oder Kaiser-Ludwig-Ring",
     openingHours: "24",
     pricePerHour: "0,50",
     doorHeight: "",
@@ -70,7 +70,7 @@ export const allParkingAreas: IParkingArea[] = [
   {
     id: 7,
     name: "ACC",
-    adress: "Schießstätteweg",
+    address: "Schießstätteweg",
     openingHours: "24",
     pricePerHour: "0,50",
     doorHeight: "",
@@ -81,7 +81,7 @@ export const allParkingAreas: IParkingArea[] = [
   {
     id: 8,
     name: "Altstadtgarage",
-    adress: "Kaiser-Ludwig-Ring",
+    address: "Kaiser-Ludwig-Ring",
     openingHours: "24",
     pricePerHour: "1,00",
     doorHeight: "2",
@@ -92,7 +92,7 @@ export const allParkingAreas: IParkingArea[] = [
   {
     id: 9,
     name: "Marienstraße",
-    adress: "Emailfabrikstraße oder Regensburger Straße",
+    address: "Emailfabrikstraße oder Regensburger Straße",
     openingHours: "24",
     pricePerHour: "1,50",
     doorHeight: "2,10",
