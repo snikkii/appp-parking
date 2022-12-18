@@ -18,6 +18,7 @@ interface IParkingAreaDescription {
   latUser: number;
   longUser: number;
   handleShowParkingAreaDescription(parkingAreaDescription: boolean): void;
+  handleParkingAreaDetails(parkingAreaDetails: boolean): void;
 }
 
 export default function ParkingAreaDescription(props: IParkingAreaDescription) {
@@ -27,13 +28,14 @@ export default function ParkingAreaDescription(props: IParkingAreaDescription) {
     latUser,
     longUser,
     handleShowParkingAreaDescription,
+    handleParkingAreaDetails,
   } = props;
   const [parkingAreaData, setParkingAreaData] = useState({} as IParkingArea);
   const [parkingAreaDetailsData, setParkingAreaDetailsData] = useState(
     {} as IParkingAreaDetails
   );
   const [databaseError, setDatabaseError] = useState(false);
-  const [favorite, setFavorite] = useState(false);
+  const [favorite, setFavorite] = useState(0);
 
   const fetchDataFromTable = async () => {
     try {
@@ -48,8 +50,7 @@ export default function ParkingAreaDescription(props: IParkingAreaDescription) {
 
       setParkingAreaData(parkingAreas);
       setParkingAreaDetailsData(parkingAreaDetails);
-
-      // setFavorite(parkingAreaData.favorite);
+      setFavorite(parkingAreas.favorite);
       setDatabaseError(false);
 
       if (parkingAreaDetails.dateOfData == "keine Daten") {
@@ -62,17 +63,14 @@ export default function ParkingAreaDescription(props: IParkingAreaDescription) {
     }
   };
 
-  const setFavoriteParkingArea = (favorite: boolean, name: string) => {
-    dbConnectionService.setFavoriteParkingArea(favorite, name);
+  const setFavoriteParkingArea = (favorite: number) => {
+    dbConnectionService.setFavoriteParkingArea(favorite, parkingAreaData.name);
     setFavorite(favorite);
   };
 
   useEffect(() => {
     fetchDataFromTable();
-    console.log("hi " + parkingAreaData.favorite);
-    setFavorite(parkingAreaData.favorite);
-    console.log(favorite);
-  }, [id, favorite]);
+  }, [id]);
 
   const showParkingAreaDescription = (showDescription: boolean) => {
     handleShowParkingAreaDescription(showDescription);
@@ -111,18 +109,15 @@ export default function ParkingAreaDescription(props: IParkingAreaDescription) {
           <View style={styles.headingContainer}>
             <View style={styles.nameContainer}>
               <Text style={styles.heading}>{parkingAreaData.name}</Text>
-              <Text style={styles.heading}>{parkingAreaData.favorite}</Text>
 
-              {favorite == true ? (
+              {favorite === 1 ? (
                 <Ionicons.Button
                   style={styles.favoriteIcons}
                   name="ios-heart"
                   size={25}
                   color="#a66378"
                   backgroundColor="transparent"
-                  onPress={() =>
-                    setFavoriteParkingArea(false, parkingAreaData.name)
-                  }
+                  onPress={() => setFavoriteParkingArea(0)}
                 />
               ) : (
                 <Ionicons.Button
@@ -131,9 +126,7 @@ export default function ParkingAreaDescription(props: IParkingAreaDescription) {
                   size={25}
                   color="#a66378"
                   backgroundColor="transparent"
-                  onPress={() =>
-                    setFavoriteParkingArea(true, parkingAreaData.name)
-                  }
+                  onPress={() => setFavoriteParkingArea(1)}
                 />
               )}
             </View>
@@ -148,7 +141,7 @@ export default function ParkingAreaDescription(props: IParkingAreaDescription) {
           </View>
           <View style={styles.itemContainer}>
             <View style={styles.item}>
-              {parkingAreaDetailsData.trend == 0 ? (
+              {parkingAreaDetailsData.trend === 0 ? (
                 <MaterialIcons
                   name="trending-neutral"
                   size={30}
@@ -156,7 +149,7 @@ export default function ParkingAreaDescription(props: IParkingAreaDescription) {
                   backgroundColor="transparent"
                 />
               ) : undefined}
-              {parkingAreaDetailsData.trend == -1 ? (
+              {parkingAreaDetailsData.trend === -1 ? (
                 <MaterialIcons
                   name="trending-down"
                   size={30}
@@ -164,7 +157,7 @@ export default function ParkingAreaDescription(props: IParkingAreaDescription) {
                   backgroundColor="transparent"
                 />
               ) : undefined}
-              {parkingAreaDetailsData.trend == 1 ? (
+              {parkingAreaDetailsData.trend === 1 ? (
                 <MaterialIcons
                   name="trending-up"
                   size={30}
@@ -194,24 +187,27 @@ export default function ParkingAreaDescription(props: IParkingAreaDescription) {
               />
               <Text style={styles.text}>{parkingAreaData.openingHours}h</Text>
             </View>
-            <View style={styles.item}>
-              <View style={styles.heightIconsContainer}>
-                <MaterialIcons
-                  name="height"
-                  size={30}
-                  color="#2e2d2d"
-                  backgroundColor="transparent"
-                />
-                <MaterialIcons
-                  name="directions-car"
-                  size={30}
-                  color="#2e2d2d"
-                  backgroundColor="transparent"
-                />
+            {parkingAreaData.doorHeight === "" ? undefined : (
+              <View style={styles.item}>
+                <View style={styles.heightIconsContainer}>
+                  <MaterialIcons
+                    name="height"
+                    size={30}
+                    color="#2e2d2d"
+                    backgroundColor="transparent"
+                  />
+                  <MaterialIcons
+                    name="directions-car"
+                    size={30}
+                    color="#2e2d2d"
+                    backgroundColor="transparent"
+                  />
+                </View>
+                <Text style={styles.text}>{parkingAreaData.doorHeight}m</Text>
               </View>
-              <Text style={styles.text}>{parkingAreaData.doorHeight}m</Text>
-            </View>
-            <TouchableOpacity>
+            )}
+
+            <TouchableOpacity onPress={() => handleParkingAreaDetails(true)}>
               <View style={styles.item}>
                 <MaterialIcons
                   name="more-horiz"

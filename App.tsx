@@ -3,18 +3,21 @@ import { Dimensions, StyleSheet, View } from "react-native";
 import { ParkingMap } from "./src/components/ParkingMap";
 import { useEffect, useState } from "react";
 import ParkingAreaDescription from "./src/components/ParkingAreaDescription";
-import Settings from "./src/components/Settings";
+import ParkingAreaList from "./src/components/ParkingAreaList";
 import { DbConnectionService } from "./src/database/DbConnectionService";
 import Ionicons from "@expo/vector-icons/Ionicons";
+import ParkingAreaDetails from "./src/components/ParkingAreaDetails";
 
 const dbConnectionService = new DbConnectionService();
 
 export default function App() {
   const [parkingAreaId, setParkingAreaId] = useState(0);
   const [showDescription, setShowDescription] = useState(false);
+  const [showDetails, setShowDetails] = useState(false);
   const [latUser, setLatUser] = useState(0);
   const [longUser, setLongUser] = useState(0);
-  const [openSettings, setOpenSettings] = useState(false);
+  const [openParkingAreaList, setOpenParkingAreaList] = useState(false);
+  const [volume, setVolume] = useState(false);
   const MINUTES_MS = 60000; // 10 Minuten
 
   useEffect(() => {
@@ -42,6 +45,10 @@ export default function App() {
     setShowDescription(parkingAreaDescription);
   };
 
+  const showParkingAreaDetails = (parkingAreaDetails: boolean) => {
+    setShowDetails(parkingAreaDetails);
+  };
+
   const getUserPosition = (latUser?: number, longUser?: number) => {
     if (latUser == undefined) {
       latUser = 0;
@@ -53,25 +60,53 @@ export default function App() {
     setLongUser(longUser);
   };
 
-  const showSettings = (showSettings: boolean) => {
-    setOpenSettings(showSettings);
+  const showParkingAreaList = (showList: boolean) => {
+    setOpenParkingAreaList(showList);
   };
 
   return (
     <View style={styles.container}>
-      <Ionicons.Button
-        style={styles.button}
-        name="settings-sharp"
-        size={30}
-        color="white"
-        backgroundColor="transparent"
-        onPress={() => setOpenSettings(true)}
-      />
-      {openSettings ? (
-        <Settings
+      <View style={styles.buttonContainer}>
+        <View style={styles.oneButtonContainer}>
+          {volume ? (
+            <Ionicons.Button
+              style={styles.listButton}
+              name="volume-high"
+              size={40}
+              color="white"
+              backgroundColor="transparent"
+              onPress={() => setVolume(false)}
+            />
+          ) : (
+            <Ionicons.Button
+              style={styles.listButton}
+              name="volume-mute"
+              size={40}
+              color="white"
+              backgroundColor="transparent"
+              onPress={() => setVolume(true)}
+            />
+          )}
+        </View>
+        <View style={styles.placeholder} />
+        <View style={styles.oneButtonContainer}>
+          <Ionicons.Button
+            style={styles.listButton}
+            name="ios-list-circle"
+            size={40}
+            color="white"
+            backgroundColor="transparent"
+            onPress={() => setOpenParkingAreaList(true)}
+          />
+        </View>
+      </View>
+      {openParkingAreaList ? (
+        <ParkingAreaList
           dbConnectionService={dbConnectionService}
-          handleShowSettings={showSettings}
+          handleShowParkingAreaList={showParkingAreaList}
           handleParkingAreaDescription={showParkingAreaDescription}
+          handleParkingAreaDetails={showParkingAreaDetails}
+          handleSetId={getParkingAreaId}
         />
       ) : (
         <ParkingMap
@@ -81,13 +116,22 @@ export default function App() {
           mapStyle={showDescription ? styles.mapWithDescription : styles.map}
         />
       )}
-      {showDescription && !openSettings ? (
+      {showDescription && !openParkingAreaList ? (
         <ParkingAreaDescription
           dbConnectionService={dbConnectionService}
           id={parkingAreaId}
           latUser={latUser}
           longUser={longUser}
           handleShowParkingAreaDescription={showParkingAreaDescription}
+          handleParkingAreaDetails={showParkingAreaDetails}
+        />
+      ) : undefined}
+
+      {showDetails ? (
+        <ParkingAreaDetails
+          dbConnectionService={dbConnectionService}
+          handleShowParkingAreaDetails={showParkingAreaDetails}
+          parkingAreaId={parkingAreaId}
         />
       ) : undefined}
 
@@ -103,29 +147,36 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "flex-end",
   },
-  settings: {
-    flexDirection: "row",
-    width: Dimensions.get("window").width,
-    height: Dimensions.get("window").height * 0.1,
-  },
   map: {
     flexDirection: "row",
     width: Dimensions.get("window").width,
-    height: Dimensions.get("window").height * 0.9,
+    height: Dimensions.get("window").height * 0.89,
   },
   mapWithDescription: {
     flexDirection: "row",
     width: Dimensions.get("window").width,
     height: Dimensions.get("window").height * 0.6,
   },
-  button: {
+  buttonContainer: {
     flexDirection: "row",
     width: Dimensions.get("window").width,
-    height: Dimensions.get("window").height * 0.1,
-    paddingTop: 50,
-    paddingRight: 20,
-    justifyContent: "flex-end",
+    height: Dimensions.get("window").height * 0.11,
+  },
+  oneButtonContainer: {
+    width: Dimensions.get("window").width * 0.2,
+    justifyContent: "center",
+  },
+  placeholder: {
+    width: Dimensions.get("window").width * 0.67,
+  },
+  listButton: {
+    paddingTop: 45,
+    paddingRight: 5,
     marginBottom: 5,
-    padding: 0,
+  },
+  volumeButton: {
+    paddingTop: 45,
+    paddingRight: 5,
+    marginBottom: 5,
   },
 });

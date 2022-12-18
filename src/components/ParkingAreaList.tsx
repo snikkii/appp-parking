@@ -12,19 +12,22 @@ import { useEffect, useState } from "react";
 import { DbConnectionService } from "../database/DbConnectionService";
 import * as SQLite from "expo-sqlite";
 
-interface ISettings {
+interface IParkingAreaList {
   dbConnectionService: DbConnectionService;
-  handleShowSettings(showSettings: boolean): void;
+  handleShowParkingAreaList(showParkingAreaList: boolean): void;
   handleParkingAreaDescription(parkingAreaDescription: boolean): void;
+  handleParkingAreaDetails(parkingAreaDetails: boolean): void;
+  handleSetId(id: number): void;
 }
 
-export default function Settings(props: ISettings) {
+export default function ParkingAreaList(props: IParkingAreaList) {
   const {
     dbConnectionService,
-    handleShowSettings,
+    handleShowParkingAreaList,
     handleParkingAreaDescription,
+    handleParkingAreaDetails,
+    handleSetId,
   } = props;
-  const [soundOn, setSoundOn] = useState(true);
   const [collapsParkingAreas, setCollapseParkingAreas] = useState(false);
   const [parkingAreaRows, setParkingAreaRows] = useState(
     {} as SQLite.SQLResultSetRowList
@@ -43,12 +46,17 @@ export default function Settings(props: ISettings) {
     }
   };
 
+  const handleSetValues = (id: number) => {
+    handleParkingAreaDetails(true);
+    handleSetId(id);
+  };
+
   useEffect(() => {
     fetchDataFromTable();
   }, [collapsParkingAreas, databaseError]);
 
-  const showSettings = (show: boolean) => {
-    handleShowSettings(show);
+  const showParkingAreaList = (show: boolean) => {
+    handleShowParkingAreaList(show);
     handleParkingAreaDescription(show);
   };
 
@@ -61,89 +69,37 @@ export default function Settings(props: ISettings) {
           size={40}
           color="#fff"
           backgroundColor="transparent"
-          onPress={() => showSettings(false)}
+          onPress={() => showParkingAreaList(false)}
         />
-        <Text style={styles.heading}>Einstellungen</Text>
+        <Text style={styles.heading}>Parkhäuser</Text>
       </View>
       <View style={styles.listContainer}>
-        {soundOn ? (
-          <TouchableOpacity
-            style={styles.volume}
-            onPress={() => setSoundOn(false)}
-          >
-            <View style={styles.listItem}>
-              <Text style={styles.itemText}>Ton an</Text>
-              <Ionicons.Button
-                style={styles.icons}
-                name="volume-high"
-                size={40}
-                color="#2e2d2d"
-                backgroundColor="transparent"
-              />
-            </View>
-          </TouchableOpacity>
-        ) : (
-          <TouchableOpacity
-            style={styles.volume}
-            onPress={() => setSoundOn(true)}
-          >
-            <View style={styles.listItem}>
-              <Text style={styles.itemText}>Ton aus</Text>
-              <Ionicons.Button
-                style={styles.icons}
-                name="volume-mute"
-                size={40}
-                color="#2e2d2d"
-                backgroundColor="transparent"
-              />
-            </View>
-          </TouchableOpacity>
-        )}
-
-        {collapsParkingAreas ? (
-          <TouchableOpacity onPress={() => setCollapseParkingAreas(false)}>
-            <View style={styles.listItem}>
-              <Text style={styles.itemText}>Parkhäuser</Text>
-              <Ionicons.Button
-                style={styles.icons}
-                name="ios-caret-up"
-                size={40}
-                color="#2e2d2d"
-                backgroundColor="transparent"
-              />
-            </View>
-          </TouchableOpacity>
-        ) : (
-          <TouchableOpacity onPress={() => setCollapseParkingAreas(true)}>
-            <View style={styles.listItem}>
-              <Text style={styles.itemText}>Parkhäuser</Text>
-              <Ionicons.Button
-                style={styles.icons}
-                name="ios-caret-down-outline"
-                size={40}
-                color="#2e2d2d"
-                backgroundColor="transparent"
-              />
-            </View>
-          </TouchableOpacity>
-        )}
-
-        {collapsParkingAreas && !databaseError ? (
+        {!databaseError ? (
           <FlatList
             style={styles.parkingList}
             data={parkingAreaRows._array}
             renderItem={({ item }) => (
               <View style={styles.listViewItem}>
-                <TouchableOpacity>
+                <TouchableOpacity onPress={() => handleSetValues(item.id)}>
                   <View style={styles.parkingListItem}>
-                    <Text style={styles.listText}>{item.name}</Text>
+                    <Text style={styles.listText}>
+                      {item.name}
+                      {item.favorite === 1 ? (
+                        <Ionicons
+                          style={styles.icons}
+                          name="ios-heart"
+                          size={25}
+                          color="#a66378"
+                          backgroundColor="transparent"
+                        />
+                      ) : undefined}
+                    </Text>
                   </View>
                 </TouchableOpacity>
               </View>
             )}
           />
-        ) : undefined}
-        {databaseError && collapsParkingAreas ? (
+        ) : (
           <View style={styles.warnItem}>
             <Text style={styles.warnText}>
               Die Parkhäuser können aktuell nicht angezeigt werden. App bitte
@@ -157,7 +113,7 @@ export default function Settings(props: ISettings) {
               backgroundColor="transparent"
             />
           </View>
-        ) : undefined}
+        )}
       </View>
     </View>
   );
@@ -179,7 +135,6 @@ const styles = StyleSheet.create({
     width: Dimensions.get("window").width * 0.2,
     marginTop: 80,
     marginLeft: 40,
-    color: "#fff",
     fontSize: 43,
   },
   heading: {
@@ -194,35 +149,6 @@ const styles = StyleSheet.create({
     padding: 10,
     marginBottom: 50,
     justifyContent: "center",
-    alignItems: "center",
-  },
-  listItem: {
-    flexDirection: "row",
-    width: Dimensions.get("window").width * 0.9,
-    height: Dimensions.get("window").height * 0.1,
-    borderColor: "#fff",
-    backgroundColor: "#fff",
-    borderWidth: 2,
-    borderRadius: 10,
-    margin: 5,
-    padding: 10,
-    justifyContent: "center",
-  },
-  volume: {
-    flexDirection: "row",
-  },
-  volumeSettings: {
-    flexDirection: "row",
-    justifyContent: "center",
-    borderColor: "#fff",
-    borderWidth: 2,
-    margin: 5,
-    padding: 10,
-  },
-  itemText: {
-    margin: 10,
-    color: "#2e2d2d",
-    fontSize: 30,
     alignItems: "center",
   },
   icons: {
@@ -242,11 +168,11 @@ const styles = StyleSheet.create({
   },
   parkingList: {
     width: Dimensions.get("window").width * 0.9,
-    height: Dimensions.get("window").height * 0.5,
+    height: Dimensions.get("window").height * 0.7,
   },
   parkingListItem: {
     flexDirection: "row",
-    width: Dimensions.get("window").width * 0.6,
+    width: Dimensions.get("window").width * 0.8,
     height: Dimensions.get("window").height * 0.1,
     borderColor: "#fff",
     backgroundColor: "#fff",
@@ -259,7 +185,7 @@ const styles = StyleSheet.create({
   listText: {
     margin: 10,
     color: "#2e2d2d",
-    fontSize: 20,
+    fontSize: 30,
     alignItems: "center",
   },
   warnText: {

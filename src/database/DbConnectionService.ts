@@ -39,7 +39,7 @@ export class DbConnectionService {
         // tx.executeSql("drop table parkingdetails");
         // tx.executeSql("drop table parkingarea");
         tx.executeSql(
-          "create table if not exists parkingarea (id integer primary key not null, name string, adress string, openingHours string, pricePerHour string, doorHeight string, favorite boolean, lat number, long number);"
+          "create table if not exists parkingarea (id integer primary key not null, name string, adress string, openingHours string, pricePerHour string, doorHeight string, favorite number, lat number, long number);"
         );
         tx.executeSql("select * from parkingarea", [], (_, { rows }) => {
           if (rows.length == 0) {
@@ -52,7 +52,7 @@ export class DbConnectionService {
                   parkingArea.openingHours,
                   parkingArea.pricePerHour,
                   parkingArea.doorHeight,
-                  parkingArea.favorite.toString(),
+                  parkingArea.favorite,
                   parkingArea.lat,
                   parkingArea.long,
                 ]
@@ -266,7 +266,7 @@ export class DbConnectionService {
       this.parkingAreaDb.transaction(
         (tx) => {
           tx.executeSql(
-            "select * from parkingarea order by name asc",
+            "select * from parkingarea order by favorite desc, name asc",
             [],
             (tx, result) => {
               resolve(result.rows);
@@ -280,12 +280,12 @@ export class DbConnectionService {
     });
   };
 
-  public setFavoriteParkingArea = (favorite: boolean, name: string) => {
+  public setFavoriteParkingArea = (favorite: number, name: string) => {
     this.parkingAreaDb.transaction(
       (tx) => {
         tx.executeSql(
           "update parkingarea set favorite = ? where name = ?",
-          [favorite.toString(), name],
+          [favorite, name],
           (tx, result) => {}
         );
       },

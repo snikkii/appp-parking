@@ -37,7 +37,7 @@ export function ParkingMap(props: IParkingMapProps) {
     })();
   }, []);
 
-  const showParkingAreaDescription = (
+  const handleSetValues = (
     id: number,
     showDescription: boolean,
     latUser?: number,
@@ -81,7 +81,7 @@ export function ParkingMap(props: IParkingMapProps) {
             }}
             title={parkingArea.name}
             onPress={() => {
-              showParkingAreaDescription(
+              handleSetValues(
                 parkingArea.id,
                 true,
                 location?.coords.latitude,
