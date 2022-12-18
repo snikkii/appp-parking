@@ -1,5 +1,5 @@
 import { StyleSheet, Text, Dimensions, View } from "react-native";
-import { Ionicons, MaterialIcons } from "@expo/vector-icons";
+import { Ionicons } from "@expo/vector-icons";
 import { DbConnectionService } from "../database/DbConnectionService";
 import { IParkingArea } from "../models/IParkingArea";
 import { useEffect, useState } from "react";
@@ -313,8 +313,6 @@ const styles = StyleSheet.create({
   },
   listViewItemNotGood: {
     flexDirection: "column",
-    // width: Dimensions.get("window").width * 0.9,
-    // height: Dimensions.get("window").height * 0.1,
     justifyContent: "flex-start",
     alignItems: "flex-start",
     margin: 5,
@@ -326,8 +324,6 @@ const styles = StyleSheet.create({
   },
   listViewItem: {
     flexDirection: "column",
-    // width: Dimensions.get("window").width * 0.9,
-    // height: Dimensions.get("window").height * 0.1,
     justifyContent: "flex-start",
     alignItems: "flex-start",
     margin: 5,
@@ -339,12 +335,9 @@ const styles = StyleSheet.create({
   },
   listItem: {
     flexDirection: "column",
-    // width: Dimensions.get("window").width * 0.8,
-    // height: Dimensions.get("window").height * 0.05,
     justifyContent: "flex-start",
   },
   listHeading: {
-    // color: "#d19fa0",
     color: "#a2cfcd",
     fontSize: 15,
     alignItems: "flex-start",

@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 import ParkingAreaDescription from "./src/components/ParkingAreaDescription";
 import ParkingAreaList from "./src/components/ParkingAreaList";
 import { DbConnectionService } from "./src/database/DbConnectionService";
-import { Ionicons, MaterialIcons } from "@expo/vector-icons";
+import { Ionicons } from "@expo/vector-icons";
 import ParkingAreaDetails from "./src/components/ParkingAreaDetails";
 
 const dbConnectionService = new DbConnectionService();
@@ -18,7 +18,7 @@ export default function App() {
   const [longUser, setLongUser] = useState(0);
   const [openParkingAreaList, setOpenParkingAreaList] = useState(false);
   const [volume, setVolume] = useState(false);
-  const MINUTES_MS = 60000; // 10 Minuten
+  const MINUTES_MS = 60000; // 1 minute TODO: change to ten minutes when app is finished
 
   useEffect(() => {
     dbConnectionService.createTables();
