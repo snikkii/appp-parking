@@ -5,6 +5,7 @@ import { IParkingArea } from "../models/IParkingArea";
 import { XMLParser } from "fast-xml-parser";
 import { decode } from "html-entities";
 import { IParkingAreaDetails } from "../models/IParkingAreaDetails";
+import Toast from "react-native-root-toast";
 
 export class DbConnectionService {
   public parkingAreaDb!:
@@ -36,8 +37,8 @@ export class DbConnectionService {
   public createTables = () => {
     this.parkingAreaDb.transaction(
       (tx) => {
-        tx.executeSql("drop table parkingdetails");
-        tx.executeSql("drop table parkingarea");
+        // tx.executeSql("drop table parkingdetails");
+        // tx.executeSql("drop table parkingarea");
         tx.executeSql(
           "create table if not exists parkingarea (id integer primary key not null, name string, address string, openingHours string, pricePerHour string, doorHeight string, favorite number, lat number, long number);"
         );
@@ -84,6 +85,7 @@ export class DbConnectionService {
         let ctr = 0;
         for (const elem of obj.Daten.Parkhaus) {
           elem.Name = decode(elem.Name, { level: "xml" });
+          elem.Status = decode(elem.Status, { level: "xml" });
           this.insertIntoDetailsTable(
             elem.Name,
             dateOfData,
@@ -100,10 +102,16 @@ export class DbConnectionService {
       })
       .catch((error) => {
         console.error(error);
-        Alert.alert(
-          "Warnung!",
-          "Die aktuellen Parkhausdaten konnten nicht abgerufen werden. Bitte Internetverbindung prüfen!"
+        Toast.show(
+          "Die aktuellen Parkhausdaten konnten nicht abgerufen werden. Bitte Internetverbindung prüfen!",
+          {
+            duration: Toast.durations.LONG,
+          }
         );
+        // Alert.alert(
+        //   "Warnung!",
+        //   "Die aktuellen Parkhausdaten konnten nicht abgerufen werden. Bitte Internetverbindung prüfen!"
+        // );
       });
   };
 

@@ -126,19 +126,22 @@ const styles = StyleSheet.create({
   headingContainer: {
     flexDirection: "row",
     width: Dimensions.get("window").width,
-    height: Dimensions.get("window").height * 0.2,
+    height: Dimensions.get("window").height * 0.1,
     justifyContent: "center",
+    marginTop: 80,
+    marginBottom: 0,
   },
   headingIcon: {
     width: Dimensions.get("window").width * 0.2,
-    marginTop: 80,
     marginLeft: 40,
+    marginBottom: 0,
     fontSize: 43,
   },
   heading: {
-    marginTop: 80,
     width: Dimensions.get("window").width * 0.8,
+    height: Dimensions.get("window").height * 0.1,
     color: "#fff",
+    marginBottom: 0,
     fontSize: 43,
   },
   listContainer: {

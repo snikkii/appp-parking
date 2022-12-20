@@ -4,6 +4,7 @@ import { DbConnectionService } from "../database/DbConnectionService";
 import { IParkingArea } from "../models/IParkingArea";
 import { useEffect, useState } from "react";
 import { IParkingAreaDetails } from "../models/IParkingAreaDetails";
+import Toast from "react-native-root-toast";
 
 interface IParkingAreaDetailsList {
   dbConnectionService: DbConnectionService;
@@ -64,6 +65,15 @@ export default function ParkingAreaList(props: IParkingAreaDetailsList) {
   const setFavoriteParkingArea = (favorite: number) => {
     dbConnectionService.setFavoriteParkingArea(favorite, parkingAreaData.name);
     setFavorite(favorite);
+    if (favorite == 1) {
+      Toast.show("Parkhaus erfolgreich zu Favoriten hinzugefügt!", {
+        duration: Toast.durations.SHORT,
+      });
+    } else if (favorite == 0) {
+      Toast.show("Parkhaus erfolgreich von Favoriten entfernt!", {
+        duration: Toast.durations.SHORT,
+      });
+    }
   };
 
   useEffect(() => {
@@ -73,7 +83,7 @@ export default function ParkingAreaList(props: IParkingAreaDetailsList) {
   return (
     <View style={styles.container}>
       {!databaseError ? (
-        <View>
+        <View style={styles.outerHeadingContainer}>
           <View style={styles.headingContainer}>
             <Ionicons.Button
               style={styles.headingIcon}
@@ -83,28 +93,27 @@ export default function ParkingAreaList(props: IParkingAreaDetailsList) {
               backgroundColor="transparent"
               onPress={() => showParkingAreaDetails(false)}
             />
-            <Text style={styles.heading}>
-              {parkingAreaData.name}
-              {favorite === 1 ? (
-                <Ionicons.Button
-                  style={styles.icons}
-                  name="ios-heart"
-                  size={40}
-                  color="#a66378"
-                  backgroundColor="transparent"
-                  onPress={() => setFavoriteParkingArea(0)}
-                />
-              ) : (
-                <Ionicons.Button
-                  style={styles.icons}
-                  name="ios-heart-outline"
-                  size={40}
-                  color="#a66378"
-                  backgroundColor="transparent"
-                  onPress={() => setFavoriteParkingArea(1)}
-                />
-              )}
-            </Text>
+            <Text style={styles.heading}>{parkingAreaData.name}</Text>
+
+            {favorite === 1 ? (
+              <Ionicons.Button
+                style={styles.icons}
+                name="ios-heart"
+                size={40}
+                color="#a66378"
+                backgroundColor="transparent"
+                onPress={() => setFavoriteParkingArea(0)}
+              />
+            ) : (
+              <Ionicons.Button
+                style={styles.icons}
+                name="ios-heart-outline"
+                size={40}
+                color="#a66378"
+                backgroundColor="transparent"
+                onPress={() => setFavoriteParkingArea(1)}
+              />
+            )}
           </View>
 
           <View style={styles.listContainer}>
@@ -275,28 +284,36 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     borderRadius: 10,
   },
+  outerHeadingContainer: {
+    flexDirection: "column",
+    alignItems: "center",
+  },
   headingContainer: {
     flexDirection: "row",
-    width: Dimensions.get("window").width,
-    height: Dimensions.get("window").height * 0.2,
+    width: Dimensions.get("window").width * 0.9,
+    height: Dimensions.get("window").height * 0.1,
     justifyContent: "center",
+    alignItems: "center",
+    marginTop: 80,
+    marginBottom: 0,
   },
   headingIcon: {
     width: Dimensions.get("window").width * 0.2,
-    marginTop: 80,
+    marginBottom: 0,
     marginLeft: 40,
     fontSize: 43,
   },
   heading: {
-    marginTop: 75,
-    width: Dimensions.get("window").width * 0.8,
+    width: Dimensions.get("window").width * 0.6,
+    height: Dimensions.get("window").height * 0.1,
+    marginTop: 35,
     color: "#fff",
-    fontSize: 35,
+    fontSize: 30,
   },
   icons: {
     padding: 0,
-    marginLeft: 10,
-    marginTop: 5,
+    paddingRight: 10,
+    marginRight: 30,
     alignItems: "center",
   },
   listContainer: {

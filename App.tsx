@@ -7,6 +7,8 @@ import ParkingAreaList from "./src/components/ParkingAreaList";
 import { DbConnectionService } from "./src/database/DbConnectionService";
 import { Ionicons } from "@expo/vector-icons";
 import ParkingAreaDetails from "./src/components/ParkingAreaDetails";
+import { RootSiblingParent } from "react-native-root-siblings";
+import { useGeofenceEvent } from "./src/database/GeofenceTaskManager";
 
 const dbConnectionService = new DbConnectionService();
 
@@ -19,6 +21,7 @@ export default function App() {
   const [openParkingAreaList, setOpenParkingAreaList] = useState(false);
   const [volume, setVolume] = useState(false);
   const MINUTES_MS = 60000; // 1 minute TODO: change to ten minutes when app is finished
+  const [parkingAreaName, isInGeofence] = useGeofenceEvent();
 
   useEffect(() => {
     dbConnectionService.createTables();
@@ -33,6 +36,10 @@ export default function App() {
       clearInterval(intervalCall);
     };
   }, []);
+
+  useEffect(() => {
+    console.log(parkingAreaName + "  " + isInGeofence.toString());
+  }, [isInGeofence, parkingAreaName]);
 
   const getParkingAreaId = (id: number) => {
     setParkingAreaId(id);
@@ -65,78 +72,76 @@ export default function App() {
   };
 
   return (
-    <View style={styles.container}>
-      <View style={styles.buttonContainer}>
-        <View style={styles.oneButtonContainer}>
-          {volume ? (
+    <RootSiblingParent>
+      <View style={styles.container}>
+        <StatusBar style="light" />
+        <View style={styles.buttonContainer}>
+          <View style={styles.oneButtonContainer}>
+            {volume ? (
+              <Ionicons.Button
+                name="volume-high"
+                size={35}
+                color="white"
+                backgroundColor="transparent"
+                onPress={() => setVolume(false)}
+              />
+            ) : (
+              <Ionicons.Button
+                name="volume-mute"
+                size={35}
+                color="white"
+                backgroundColor="transparent"
+                onPress={() => setVolume(true)}
+              />
+            )}
+          </View>
+          <View style={styles.placeholder} />
+          <View style={styles.oneButtonContainer}>
             <Ionicons.Button
-              style={styles.listButton}
-              name="volume-high"
-              size={40}
+              name="ios-list-circle"
+              size={35}
               color="white"
               backgroundColor="transparent"
-              onPress={() => setVolume(false)}
+              onPress={() => setOpenParkingAreaList(true)}
             />
-          ) : (
-            <Ionicons.Button
-              style={styles.listButton}
-              name="volume-mute"
-              size={40}
-              color="white"
-              backgroundColor="transparent"
-              onPress={() => setVolume(true)}
-            />
-          )}
+          </View>
         </View>
-        <View style={styles.placeholder} />
-        <View style={styles.oneButtonContainer}>
-          <Ionicons.Button
-            style={styles.listButton}
-            name="ios-list-circle"
-            size={40}
-            color="white"
-            backgroundColor="transparent"
-            onPress={() => setOpenParkingAreaList(true)}
+        {openParkingAreaList ? (
+          <ParkingAreaList
+            dbConnectionService={dbConnectionService}
+            handleShowParkingAreaList={showParkingAreaList}
+            handleParkingAreaDescription={showParkingAreaDescription}
+            handleParkingAreaDetails={showParkingAreaDetails}
+            handleSetId={getParkingAreaId}
           />
-        </View>
+        ) : (
+          <ParkingMap
+            handleParkingAreaId={getParkingAreaId}
+            handleParkingAreaDescription={showParkingAreaDescription}
+            handleUserPosition={getUserPosition}
+            mapStyle={showDescription ? styles.mapWithDescription : styles.map}
+          />
+        )}
+        {showDescription && !openParkingAreaList ? (
+          <ParkingAreaDescription
+            dbConnectionService={dbConnectionService}
+            id={parkingAreaId}
+            latUser={latUser}
+            longUser={longUser}
+            handleShowParkingAreaDescription={showParkingAreaDescription}
+            handleParkingAreaDetails={showParkingAreaDetails}
+          />
+        ) : undefined}
+
+        {showDetails ? (
+          <ParkingAreaDetails
+            dbConnectionService={dbConnectionService}
+            handleShowParkingAreaDetails={showParkingAreaDetails}
+            parkingAreaId={parkingAreaId}
+          />
+        ) : undefined}
       </View>
-      {openParkingAreaList ? (
-        <ParkingAreaList
-          dbConnectionService={dbConnectionService}
-          handleShowParkingAreaList={showParkingAreaList}
-          handleParkingAreaDescription={showParkingAreaDescription}
-          handleParkingAreaDetails={showParkingAreaDetails}
-          handleSetId={getParkingAreaId}
-        />
-      ) : (
-        <ParkingMap
-          handleParkingAreaId={getParkingAreaId}
-          handleParkingAreaDescription={showParkingAreaDescription}
-          handleUserPosition={getUserPosition}
-          mapStyle={showDescription ? styles.mapWithDescription : styles.map}
-        />
-      )}
-      {showDescription && !openParkingAreaList ? (
-        <ParkingAreaDescription
-          dbConnectionService={dbConnectionService}
-          id={parkingAreaId}
-          latUser={latUser}
-          longUser={longUser}
-          handleShowParkingAreaDescription={showParkingAreaDescription}
-          handleParkingAreaDetails={showParkingAreaDetails}
-        />
-      ) : undefined}
-
-      {showDetails ? (
-        <ParkingAreaDetails
-          dbConnectionService={dbConnectionService}
-          handleShowParkingAreaDetails={showParkingAreaDetails}
-          parkingAreaId={parkingAreaId}
-        />
-      ) : undefined}
-
-      <StatusBar style="light" />
-    </View>
+    </RootSiblingParent>
   );
 }
 
@@ -161,6 +166,8 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     width: Dimensions.get("window").width,
     height: Dimensions.get("window").height * 0.11,
+    paddingTop: 38,
+    marginBottom: 3,
   },
   oneButtonContainer: {
     width: Dimensions.get("window").width * 0.2,
@@ -168,15 +175,5 @@ const styles = StyleSheet.create({
   },
   placeholder: {
     width: Dimensions.get("window").width * 0.67,
-  },
-  listButton: {
-    paddingTop: 45,
-    paddingRight: 5,
-    marginBottom: 5,
-  },
-  volumeButton: {
-    paddingTop: 45,
-    paddingRight: 5,
-    marginBottom: 5,
   },
 });

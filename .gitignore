@@ -22,3 +22,6 @@ web-build/
 /doku/*.out
 /doku/*.gz
 /doku/*.toc
+
+
+.idea/

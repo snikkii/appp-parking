@@ -11,6 +11,7 @@ import { DbConnectionService } from "../database/DbConnectionService";
 import { IParkingArea } from "../models/IParkingArea";
 import { IParkingAreaDetails } from "../models/IParkingAreaDetails";
 import { MaterialIcons, Ionicons } from "@expo/vector-icons";
+import Toast from "react-native-root-toast";
 
 interface IParkingAreaDescription {
   dbConnectionService: DbConnectionService;
@@ -66,11 +67,20 @@ export default function ParkingAreaDescription(props: IParkingAreaDescription) {
   const setFavoriteParkingArea = (favorite: number) => {
     dbConnectionService.setFavoriteParkingArea(favorite, parkingAreaData.name);
     setFavorite(favorite);
+    if (favorite == 1) {
+      Toast.show("Parkhaus erfolgreich zu Favoriten hinzugefügt!", {
+        duration: Toast.durations.SHORT,
+      });
+    } else if (favorite == 0) {
+      Toast.show("Parkhaus erfolgreich von Favoriten entfernt!", {
+        duration: Toast.durations.SHORT,
+      });
+    }
   };
 
   useEffect(() => {
     fetchDataFromTable();
-  }, [id]);
+  }, [id, handleParkingAreaDetails]);
 
   const showParkingAreaDescription = (showDescription: boolean) => {
     handleShowParkingAreaDescription(showDescription);
