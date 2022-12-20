@@ -18,6 +18,7 @@ interface IParkingAreaDescription {
   id: number;
   latUser: number;
   longUser: number;
+  showLetsGo: string;
   handleShowParkingAreaDescription(parkingAreaDescription: boolean): void;
   handleParkingAreaDetails(parkingAreaDetails: boolean): void;
 }
@@ -28,6 +29,7 @@ export default function ParkingAreaDescription(props: IParkingAreaDescription) {
     id,
     latUser,
     longUser,
+    showLetsGo,
     handleShowParkingAreaDescription,
     handleParkingAreaDetails,
   } = props;
@@ -229,63 +231,19 @@ export default function ParkingAreaDescription(props: IParkingAreaDescription) {
               </View>
             </TouchableOpacity>
           </View>
-          <TouchableOpacity>
-            <View style={styles.navigateItem}>
-              <MaterialIcons
-                name="directions"
-                size={30}
-                color="#2e2d2d"
-                backgroundColor="transparent"
-              />
-              <Text style={styles.text}>Los</Text>
-            </View>
-          </TouchableOpacity>
-
-          {/* <Text style={styles.text}>
-            <MaterialIcons
-              name="height"
-              size={20}
-              color="#fff"
-              backgroundColor="transparent"
-            />
-            Höhe: {parkingAreaData.doorHeight}, Favorit:{" "}
-            {parkingAreaData.favorite},
-          </Text>
-          <Text style={styles.text}>
-            LatP: {parkingAreaData.lat}, LongP: {parkingAreaData.long}
-          </Text>
-          <Text style={styles.text}>
-            LatU: {latUser}, LongU: {longUser}
-          </Text>
-          <Text style={styles.text}>
-            <MaterialIcons
-              name="trending-down"
-              size={20}
-              color="#fff"
-              backgroundColor="transparent"
-            />
-            <MaterialIcons
-              name="trending-neutral"
-              size={20}
-              color="#fff"
-              backgroundColor="transparent"
-            />
-            <MaterialIcons
-              name="trending-up"
-              size={20}
-              color="#fff"
-              backgroundColor="transparent"
-            />
-            Gesamt: {parkingAreaDetailsData.numberOfLots}, Belegt:{" "}
-            {parkingAreaDetailsData.numberOfTakenLots}, Frei:
-            {parkingAreaDetailsData.numberOfFreeLots}
-          </Text>
-          <Text style={styles.text}>
-            Trend: {parkingAreaDetailsData.trend}, Status:{" "}
-            {parkingAreaDetailsData.status}, Geschlossen:{" "}
-            {parkingAreaDetailsData.closed}, Datum:
-            {parkingAreaDetailsData.dateOfData}
-          </Text> */}
+          {showLetsGo === "true" ? (
+            <TouchableOpacity>
+              <View style={styles.navigateItem}>
+                <MaterialIcons
+                  name="directions"
+                  size={30}
+                  color="#2e2d2d"
+                  backgroundColor="transparent"
+                />
+                <Text style={styles.text}>Los</Text>
+              </View>
+            </TouchableOpacity>
+          ) : undefined}
         </View>
       )}
     </View>
@@ -294,14 +252,12 @@ export default function ParkingAreaDescription(props: IParkingAreaDescription) {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
     backgroundColor: "#2e2d2d",
     alignItems: "center",
     justifyContent: "flex-start",
     height: Dimensions.get("window").height * 0.3,
   },
   warningContainer: {
-    flex: 1,
     backgroundColor: "#fd526c",
     alignItems: "center",
     justifyContent: "flex-start",

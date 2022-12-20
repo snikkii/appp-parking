@@ -8,7 +8,7 @@ import { DbConnectionService } from "./src/database/DbConnectionService";
 import { Ionicons } from "@expo/vector-icons";
 import ParkingAreaDetails from "./src/components/ParkingAreaDetails";
 import { RootSiblingParent } from "react-native-root-siblings";
-import { useGeofenceEvent } from "./src/database/GeofenceTaskManager";
+import { useGeofenceEvent } from "./src/hooks/useGeofenceEvent";
 
 const dbConnectionService = new DbConnectionService();
 
@@ -21,7 +21,7 @@ export default function App() {
   const [openParkingAreaList, setOpenParkingAreaList] = useState(false);
   const [volume, setVolume] = useState(false);
   const MINUTES_MS = 60000; // 1 minute TODO: change to ten minutes when app is finished
-  const [parkingAreaName, isInGeofence] = useGeofenceEvent();
+  const parkingAreaNameAndInGeofence = useGeofenceEvent();
 
   useEffect(() => {
     dbConnectionService.createTables();
@@ -38,8 +38,9 @@ export default function App() {
   }, []);
 
   useEffect(() => {
-    console.log(parkingAreaName + "  " + isInGeofence.toString());
-  }, [isInGeofence, parkingAreaName]);
+    console.log(parkingAreaNameAndInGeofence);
+    // TODO: tts
+  }, [parkingAreaNameAndInGeofence]);
 
   const getParkingAreaId = (id: number) => {
     setParkingAreaId(id);
@@ -75,37 +76,39 @@ export default function App() {
     <RootSiblingParent>
       <View style={styles.container}>
         <StatusBar style="light" />
-        <View style={styles.buttonContainer}>
-          <View style={styles.oneButtonContainer}>
-            {volume ? (
+        {!openParkingAreaList ? (
+          <View style={styles.buttonContainer}>
+            <View style={styles.oneButtonContainer}>
+              {volume ? (
+                <Ionicons.Button
+                  name="volume-high"
+                  size={35}
+                  color="white"
+                  backgroundColor="transparent"
+                  onPress={() => setVolume(false)}
+                />
+              ) : (
+                <Ionicons.Button
+                  name="volume-mute"
+                  size={35}
+                  color="white"
+                  backgroundColor="transparent"
+                  onPress={() => setVolume(true)}
+                />
+              )}
+            </View>
+            <View style={styles.placeholder} />
+            <View style={styles.oneButtonContainer}>
               <Ionicons.Button
-                name="volume-high"
+                name="ios-list-circle"
                 size={35}
                 color="white"
                 backgroundColor="transparent"
-                onPress={() => setVolume(false)}
+                onPress={() => setOpenParkingAreaList(true)}
               />
-            ) : (
-              <Ionicons.Button
-                name="volume-mute"
-                size={35}
-                color="white"
-                backgroundColor="transparent"
-                onPress={() => setVolume(true)}
-              />
-            )}
+            </View>
           </View>
-          <View style={styles.placeholder} />
-          <View style={styles.oneButtonContainer}>
-            <Ionicons.Button
-              name="ios-list-circle"
-              size={35}
-              color="white"
-              backgroundColor="transparent"
-              onPress={() => setOpenParkingAreaList(true)}
-            />
-          </View>
-        </View>
+        ) : undefined}
         {openParkingAreaList ? (
           <ParkingAreaList
             dbConnectionService={dbConnectionService}
@@ -128,6 +131,7 @@ export default function App() {
             id={parkingAreaId}
             latUser={latUser}
             longUser={longUser}
+            showLetsGo={parkingAreaNameAndInGeofence[1]}
             handleShowParkingAreaDescription={showParkingAreaDescription}
             handleParkingAreaDetails={showParkingAreaDetails}
           />
@@ -155,19 +159,19 @@ const styles = StyleSheet.create({
   map: {
     flexDirection: "row",
     width: Dimensions.get("window").width,
-    height: Dimensions.get("window").height * 0.89,
+    height: Dimensions.get("window").height * 0.93,
   },
   mapWithDescription: {
     flexDirection: "row",
     width: Dimensions.get("window").width,
-    height: Dimensions.get("window").height * 0.6,
+    height: Dimensions.get("window").height * 0.63,
   },
   buttonContainer: {
     flexDirection: "row",
     width: Dimensions.get("window").width,
-    height: Dimensions.get("window").height * 0.11,
-    paddingTop: 38,
-    marginBottom: 3,
+    height: Dimensions.get("window").height * 0.1,
+    // paddingTop: 38,
+    // marginBottom: 3,
   },
   oneButtonContainer: {
     width: Dimensions.get("window").width * 0.2,

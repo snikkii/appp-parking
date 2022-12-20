@@ -1,10 +1,17 @@
-import { StyleSheet, Text, Dimensions, View } from "react-native";
+import {
+  StyleSheet,
+  Text,
+  Dimensions,
+  View,
+  ActivityIndicator,
+} from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { DbConnectionService } from "../database/DbConnectionService";
 import { IParkingArea } from "../models/IParkingArea";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { IParkingAreaDetails } from "../models/IParkingAreaDetails";
 import Toast from "react-native-root-toast";
+import * as SplashScreen from "expo-splash-screen";
 
 interface IParkingAreaDetailsList {
   dbConnectionService: DbConnectionService;
@@ -26,9 +33,11 @@ export default function ParkingAreaList(props: IParkingAreaDetailsList) {
   const showParkingAreaDetails = (showDetails: boolean) => {
     handleShowParkingAreaDetails(showDetails);
   };
+  const [ready, setReady] = useState(false);
 
   const fetchDataFromTable = async () => {
     try {
+      setReady(false);
       let parkingAreas = (await dbConnectionService.getDataFromParkingAreaTable(
         parkingAreaId
       )) as IParkingArea;
@@ -52,7 +61,6 @@ export default function ParkingAreaList(props: IParkingAreaDetailsList) {
         setClosed("Geschlossen");
       }
       setFavorite(parkingAreas.favorite);
-
       setParkingAreaData(parkingAreas);
       setParkingAreaDetailsData(parkingAreaDetails);
       setDatabaseError(false);
@@ -75,201 +83,213 @@ export default function ParkingAreaList(props: IParkingAreaDetailsList) {
       });
     }
   };
+  const myTimeout = setTimeout(() => {
+    setReady(true);
+  }, 2000);
 
   useEffect(() => {
     fetchDataFromTable();
+    myTimeout;
   }, [parkingAreaId]);
 
   return (
-    <View style={styles.container}>
-      {!databaseError ? (
-        <View style={styles.outerHeadingContainer}>
-          <View style={styles.headingContainer}>
-            <Ionicons.Button
-              style={styles.headingIcon}
-              name="ios-arrow-back"
-              size={40}
-              color="#fff"
-              backgroundColor="transparent"
-              onPress={() => showParkingAreaDetails(false)}
-            />
-            <Text style={styles.heading}>{parkingAreaData.name}</Text>
+    <View>
+      {ready ? (
+        <View style={styles.container}>
+          {!databaseError ? (
+            <View style={styles.outerHeadingContainer}>
+              <View style={styles.headingContainer}>
+                <Ionicons.Button
+                  style={styles.headingIcon}
+                  name="ios-arrow-back"
+                  size={40}
+                  color="#fff"
+                  backgroundColor="transparent"
+                  onPress={() => showParkingAreaDetails(false)}
+                />
+                <Text style={styles.heading}>{parkingAreaData.name}</Text>
 
-            {favorite === 1 ? (
-              <Ionicons.Button
-                style={styles.icons}
-                name="ios-heart"
-                size={40}
-                color="#a66378"
-                backgroundColor="transparent"
-                onPress={() => setFavoriteParkingArea(0)}
-              />
-            ) : (
-              <Ionicons.Button
-                style={styles.icons}
-                name="ios-heart-outline"
-                size={40}
-                color="#a66378"
-                backgroundColor="transparent"
-                onPress={() => setFavoriteParkingArea(1)}
-              />
-            )}
-          </View>
-
-          <View style={styles.listContainer}>
-            <View style={styles.itemContainer}>
-              <View
-                style={
-                  parkingAreaDetailsData.closed === 1
-                    ? styles.listViewItemNotGood
-                    : styles.listViewItem
-                }
-              >
-                <View style={styles.listItem}>
-                  <Text
-                    style={
-                      parkingAreaDetailsData.closed === 1
-                        ? styles.listHeadingAlt
-                        : styles.listHeading
-                    }
-                  >
-                    {closed}
-                  </Text>
-                </View>
-                {parkingAreaDetailsData.closed === 1 ? (
-                  <View style={styles.listItem}>
-                    <Text style={styles.listText}>
-                      Parkhaus ist derzeit geschlossen und kann nicht befahren
-                      werden.
-                    </Text>
-                  </View>
+                {favorite === 1 ? (
+                  <Ionicons.Button
+                    style={styles.icons}
+                    name="ios-heart"
+                    size={40}
+                    color="#a66378"
+                    backgroundColor="transparent"
+                    onPress={() => setFavoriteParkingArea(0)}
+                  />
                 ) : (
-                  <View style={styles.listItem}>
-                    <Text style={styles.listText}>
-                      {parkingAreaData.openingHours} Stunden
-                    </Text>
-                  </View>
+                  <Ionicons.Button
+                    style={styles.icons}
+                    name="ios-heart-outline"
+                    size={40}
+                    color="#a66378"
+                    backgroundColor="transparent"
+                    onPress={() => setFavoriteParkingArea(1)}
+                  />
                 )}
               </View>
+
+              <View style={styles.listContainer}>
+                <View style={styles.itemContainer}>
+                  <View
+                    style={
+                      parkingAreaDetailsData.closed === 1
+                        ? styles.listViewItemNotGood
+                        : styles.listViewItem
+                    }
+                  >
+                    <View style={styles.listItem}>
+                      <Text
+                        style={
+                          parkingAreaDetailsData.closed === 1
+                            ? styles.listHeadingAlt
+                            : styles.listHeading
+                        }
+                      >
+                        {closed}
+                      </Text>
+                    </View>
+                    {parkingAreaDetailsData.closed === 1 ? (
+                      <View style={styles.listItem}>
+                        <Text style={styles.listText}>
+                          Parkhaus ist derzeit geschlossen und kann nicht
+                          befahren werden.
+                        </Text>
+                      </View>
+                    ) : (
+                      <View style={styles.listItem}>
+                        <Text style={styles.listText}>
+                          {parkingAreaData.openingHours} Stunden
+                        </Text>
+                      </View>
+                    )}
+                  </View>
+                </View>
+
+                {parkingAreaData.address === "" ||
+                parkingAreaData.address === undefined ? undefined : (
+                  <View style={styles.itemContainer}>
+                    <View style={styles.listViewItem}>
+                      <View style={styles.listItem}>
+                        <Text style={styles.listHeading}>Einfahrt über</Text>
+                      </View>
+                      <View style={styles.listItem}>
+                        <Text style={styles.listText}>
+                          {parkingAreaData.address}
+                        </Text>
+                      </View>
+                    </View>
+                  </View>
+                )}
+
+                {parkingAreaData.doorHeight === "" ? undefined : (
+                  <View style={styles.itemContainer}>
+                    <View style={styles.listViewItem}>
+                      <View style={styles.listItem}>
+                        <Text style={styles.listHeading}>Einfahrtshöhe</Text>
+                      </View>
+                      <View style={styles.listItem}>
+                        <Text style={styles.listText}>
+                          {parkingAreaData.doorHeight}m
+                        </Text>
+                      </View>
+                    </View>
+                  </View>
+                )}
+
+                <View style={styles.itemContainer}>
+                  <View style={styles.listViewItem}>
+                    <View style={styles.listItem}>
+                      <Text style={styles.listHeading}>Kosten pro Stunde</Text>
+                    </View>
+                    <View style={styles.listItem}>
+                      <Text style={styles.listText}>
+                        {parkingAreaData.pricePerHour}€
+                      </Text>
+                    </View>
+                  </View>
+                </View>
+
+                <View style={styles.itemContainer}>
+                  <View style={styles.listViewItem}>
+                    <View style={styles.listItem}>
+                      <Text style={styles.listHeading}>Parkplätze</Text>
+                    </View>
+                    <View style={styles.listItem}>
+                      <Text style={styles.listText}>
+                        Gesamt: {parkingAreaDetailsData.numberOfLots}
+                      </Text>
+                      <Text style={styles.listText}>
+                        Belegt: {parkingAreaDetailsData.numberOfTakenLots}
+                      </Text>
+                      <Text style={styles.listText}>
+                        Frei: {parkingAreaDetailsData.numberOfFreeLots}
+                      </Text>
+                      <Text style={styles.listText}>Trend: {currentTrend}</Text>
+                    </View>
+                  </View>
+                </View>
+
+                {parkingAreaDetailsData.status !== "OK" ? (
+                  <View style={styles.itemContainer}>
+                    <View style={styles.listViewItemNotGood}>
+                      <View style={styles.listItem}>
+                        <Text style={styles.listHeadingAlt}>
+                          Aktueller Status
+                        </Text>
+                      </View>
+                      <View style={styles.listItem}>
+                        <Text style={styles.listText}>
+                          {parkingAreaDetailsData.status}
+                        </Text>
+                      </View>
+                    </View>
+                  </View>
+                ) : undefined}
+              </View>
             </View>
-
-            {parkingAreaData.address === "" ||
-            parkingAreaData.address === undefined ? undefined : (
-              <View style={styles.itemContainer}>
-                <View style={styles.listViewItem}>
-                  <View style={styles.listItem}>
-                    <Text style={styles.listHeading}>Einfahrt über</Text>
-                  </View>
-                  <View style={styles.listItem}>
-                    <Text style={styles.listText}>
-                      {parkingAreaData.address}
-                    </Text>
-                  </View>
-                </View>
+          ) : (
+            <View>
+              <View style={styles.headingContainer}>
+                <Ionicons.Button
+                  style={styles.headingIcon}
+                  name="ios-arrow-back"
+                  size={40}
+                  color="#fff"
+                  backgroundColor="transparent"
+                  onPress={() => showParkingAreaDetails(false)}
+                />
+                <Text style={styles.heading}>
+                  Achtung!
+                  <Ionicons.Button
+                    style={styles.icons}
+                    name="ios-warning"
+                    size={40}
+                    color="#fff"
+                    backgroundColor="transparent"
+                  />
+                </Text>
               </View>
-            )}
-
-            {parkingAreaData.doorHeight === "" ? undefined : (
-              <View style={styles.itemContainer}>
-                <View style={styles.listViewItem}>
-                  <View style={styles.listItem}>
-                    <Text style={styles.listHeading}>Einfahrtshöhe</Text>
+              <View style={styles.listContainer}>
+                <View style={styles.itemContainer}>
+                  <View style={styles.listViewItemNotGood}>
+                    <View style={styles.listItem}>
+                      <Text style={styles.listHeadingAlt}>Error</Text>
+                    </View>
+                    <View style={styles.listItem}>
+                      <Text style={styles.listText}>
+                        Es ist ein Fehler aufgetreten. Bitte App neu starten!
+                      </Text>
+                    </View>
                   </View>
-                  <View style={styles.listItem}>
-                    <Text style={styles.listText}>
-                      {parkingAreaData.doorHeight}m
-                    </Text>
-                  </View>
-                </View>
-              </View>
-            )}
-
-            <View style={styles.itemContainer}>
-              <View style={styles.listViewItem}>
-                <View style={styles.listItem}>
-                  <Text style={styles.listHeading}>Kosten pro Stunde</Text>
-                </View>
-                <View style={styles.listItem}>
-                  <Text style={styles.listText}>
-                    {parkingAreaData.pricePerHour}€
-                  </Text>
                 </View>
               </View>
             </View>
-
-            <View style={styles.itemContainer}>
-              <View style={styles.listViewItem}>
-                <View style={styles.listItem}>
-                  <Text style={styles.listHeading}>Parkplätze</Text>
-                </View>
-                <View style={styles.listItem}>
-                  <Text style={styles.listText}>
-                    Gesamt: {parkingAreaDetailsData.numberOfLots}
-                  </Text>
-                  <Text style={styles.listText}>
-                    Belegt: {parkingAreaDetailsData.numberOfTakenLots}
-                  </Text>
-                  <Text style={styles.listText}>
-                    Frei: {parkingAreaDetailsData.numberOfFreeLots}
-                  </Text>
-                  <Text style={styles.listText}>Trend: {currentTrend}</Text>
-                </View>
-              </View>
-            </View>
-
-            {parkingAreaDetailsData.status === "OK" ? undefined : (
-              <View style={styles.itemContainer}>
-                <View style={styles.listViewItemNotGood}>
-                  <View style={styles.listItem}>
-                    <Text style={styles.listHeadingAlt}>Aktueller Status</Text>
-                  </View>
-                  <View style={styles.listItem}>
-                    <Text style={styles.listText}>
-                      {parkingAreaDetailsData.status}
-                    </Text>
-                  </View>
-                </View>
-              </View>
-            )}
-          </View>
+          )}
         </View>
       ) : (
-        <View>
-          <View style={styles.headingContainer}>
-            <Ionicons.Button
-              style={styles.headingIcon}
-              name="ios-arrow-back"
-              size={40}
-              color="#fff"
-              backgroundColor="transparent"
-              onPress={() => showParkingAreaDetails(false)}
-            />
-            <Text style={styles.heading}>
-              Achtung!
-              <Ionicons.Button
-                style={styles.icons}
-                name="ios-warning"
-                size={40}
-                color="#fff"
-                backgroundColor="transparent"
-              />
-            </Text>
-          </View>
-          <View style={styles.listContainer}>
-            <View style={styles.itemContainer}>
-              <View style={styles.listViewItemNotGood}>
-                <View style={styles.listItem}>
-                  <Text style={styles.listHeadingAlt}>Error</Text>
-                </View>
-                <View style={styles.listItem}>
-                  <Text style={styles.listText}>
-                    Es ist ein Fehler aufgetreten. Bitte App neu starten!
-                  </Text>
-                </View>
-              </View>
-            </View>
-          </View>
-        </View>
+        <ActivityIndicator />
       )}
     </View>
   );
@@ -294,7 +314,7 @@ const styles = StyleSheet.create({
     height: Dimensions.get("window").height * 0.1,
     justifyContent: "center",
     alignItems: "center",
-    marginTop: 80,
+    // marginTop: 80,
     marginBottom: 0,
   },
   headingIcon: {

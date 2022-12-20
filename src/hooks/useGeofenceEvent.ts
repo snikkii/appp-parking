@@ -8,31 +8,30 @@ const GEOFENCE_TASK = "GEOFENCE_TASK";
 let geofenceHandles: TaskManager.TaskManagerTaskExecutor[] = [];
 
 TaskManager.defineTask(GEOFENCE_TASK, (data: any) => {
-  console.log(geofenceHandles);
   for (const handle of geofenceHandles) {
     handle(data);
   }
 });
 
 export function useGeofenceEvent() {
-  const [name, setName] = useState("");
-  const [inGeofence, setInGeofence] = useState(false);
+  let eventData: string[] = [];
 
   useEffect(() => {
     const handleIsInGeofence = ({ data, error }: any) => {
       if (error) {
-        console.log("error here");
+        console.error(error);
+        Toast.show(
+          "Es gabe in Problem mit der Anzeige der aktuellen Position."
+        );
       }
       if (data.eventType === Location.GeofencingEventType.Enter) {
-        setName(data.region.identifier);
-        setInGeofence(true);
+        eventData = [data.region.identifier, "true"];
         console.log("You've entered region:", data.region);
         Toast.show("Parkhaus " + data.region.identifier + " ist in der Nähe!", {
           duration: Toast.durations.LONG,
         });
       } else if (data.eventType === Location.GeofencingEventType.Exit) {
-        setName(data.region.identifier);
-        setInGeofence(false);
+        eventData = [data.region.identifier, "false"];
         console.log("You've left region:", data.region);
       }
     };
@@ -45,5 +44,5 @@ export function useGeofenceEvent() {
     };
   }, []);
 
-  return [name, inGeofence];
+  return eventData;
 }

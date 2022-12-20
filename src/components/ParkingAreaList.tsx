@@ -128,7 +128,7 @@ const styles = StyleSheet.create({
     width: Dimensions.get("window").width,
     height: Dimensions.get("window").height * 0.1,
     justifyContent: "center",
-    marginTop: 80,
+    // marginTop: 80,
     marginBottom: 0,
   },
   headingIcon: {
@@ -186,7 +186,7 @@ const styles = StyleSheet.create({
   listText: {
     margin: 10,
     color: "#2e2d2d",
-    fontSize: 30,
+    fontSize: 25,
     alignItems: "center",
   },
   warnText: {

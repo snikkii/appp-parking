@@ -37,7 +37,7 @@ export function ParkingMap(props: IParkingMapProps) {
       identifier: parkingArea.name,
       latitude: parkingArea.lat,
       longitude: parkingArea.long,
-      radius: 200,
+      radius: 250,
     });
   });
 
