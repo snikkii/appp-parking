@@ -243,7 +243,6 @@ export default function ParkingAreaDescription(props: IParkingAreaDescription) {
                 <Text style={styles.text}>{parkingAreaData.doorHeight}m</Text>
               </View>
             )}
-
             <TouchableOpacity
               onPress={() => handleParkingAreaDetailsData(true)}
             >

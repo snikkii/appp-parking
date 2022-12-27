@@ -13,6 +13,8 @@ import { DbConnectionService } from "../database/DbConnectionService";
 import * as SQLite from "expo-sqlite";
 import { IParkingArea } from "../models/IParkingArea";
 import { IParkingAreaDetails } from "../models/IParkingAreaDetails";
+import ParkingAreaListHeading from "./ParkingAreaListHeading";
+import ParkingAreaListItem from "./ParkingAreaListItem";
 
 interface IParkingAreaList {
   dbConnectionService: DbConnectionService;
@@ -78,52 +80,33 @@ export default function ParkingAreaList(props: IParkingAreaList) {
     }
   };
 
-  useEffect(() => {
-    fetchDataFromTable();
-  }, [handleParkingAreaDetails]);
-
   const showParkingAreaList = (show: boolean) => {
     handleShowParkingAreaList(show);
     handleParkingAreaDescription(show);
   };
 
+  useEffect(() => {
+    fetchDataFromTable();
+  }, [handleParkingAreaDetails]);
+
   return (
     <View style={styles.container}>
-      <View style={styles.headingContainer}>
-        <Ionicons.Button
-          style={styles.headingIcon}
-          name="ios-arrow-back"
-          size={40}
-          color="#fff"
-          backgroundColor="transparent"
-          onPress={() => showParkingAreaList(false)}
-        />
-        <Text style={styles.heading}>Parkhäuser</Text>
-      </View>
+      <ParkingAreaListHeading
+        arrowBackFunction={showParkingAreaList}
+        headingText={"Parkhäuser"}
+      />
       <View style={styles.listContainer}>
         {!databaseError ? (
           <FlatList
             style={styles.parkingList}
             data={parkingAreaRows._array}
             renderItem={({ item }) => (
-              <View style={styles.listViewItem}>
-                <TouchableOpacity onPress={() => handleSetValues(item.id)}>
-                  <View style={styles.parkingListItem}>
-                    <Text style={styles.listText}>
-                      {item.name}
-                      {item.favorite === 1 ? (
-                        <Ionicons
-                          style={styles.icons}
-                          name="ios-heart"
-                          size={25}
-                          color="#a66378"
-                          backgroundColor="transparent"
-                        />
-                      ) : undefined}
-                    </Text>
-                  </View>
-                </TouchableOpacity>
-              </View>
+              <ParkingAreaListItem
+                onPressFunction={handleSetValues}
+                id={item.id}
+                name={item.name}
+                favorite={item.favorite}
+              />
             )}
           />
         ) : (
@@ -151,26 +134,6 @@ const styles = StyleSheet.create({
     width: Dimensions.get("window").width,
     height: Dimensions.get("window").height,
   },
-  headingContainer: {
-    flexDirection: "row",
-    width: Dimensions.get("window").width,
-    height: Dimensions.get("window").height * 0.1,
-    justifyContent: "center",
-    marginBottom: 0,
-  },
-  headingIcon: {
-    width: Dimensions.get("window").width * 0.2,
-    marginLeft: 40,
-    marginBottom: 0,
-    fontSize: 43,
-  },
-  heading: {
-    width: Dimensions.get("window").width * 0.8,
-    height: Dimensions.get("window").height * 0.1,
-    color: "#fff",
-    marginBottom: 0,
-    fontSize: 43,
-  },
   listContainer: {
     flexDirection: "column",
     margin: 5,
@@ -185,36 +148,9 @@ const styles = StyleSheet.create({
     marginTop: 5,
     alignItems: "center",
   },
-  listViewItem: {
-    flexDirection: "column",
-    width: Dimensions.get("window").width * 0.9,
-    height: Dimensions.get("window").height * 0.1,
-    justifyContent: "center",
-    alignItems: "center",
-    margin: 5,
-    padding: 10,
-  },
   parkingList: {
     width: Dimensions.get("window").width * 0.9,
     height: Dimensions.get("window").height * 0.7,
-  },
-  parkingListItem: {
-    flexDirection: "row",
-    width: Dimensions.get("window").width * 0.8,
-    height: Dimensions.get("window").height * 0.1,
-    borderColor: "#fff",
-    backgroundColor: "#fff",
-    borderWidth: 2,
-    borderRadius: 10,
-    margin: 5,
-    padding: 10,
-    justifyContent: "center",
-  },
-  listText: {
-    margin: 10,
-    color: "#2e2d2d",
-    fontSize: 25,
-    alignItems: "center",
   },
   warnText: {
     flexWrap: "wrap",
