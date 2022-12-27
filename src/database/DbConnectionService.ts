@@ -106,12 +106,9 @@ export class DbConnectionService {
           "Die aktuellen Parkhausdaten konnten nicht abgerufen werden. Bitte Internetverbindung prüfen!",
           {
             duration: Toast.durations.LONG,
+            position: Toast.positions.BOTTOM,
           }
         );
-        // Alert.alert(
-        //   "Warnung!",
-        //   "Die aktuellen Parkhausdaten konnten nicht abgerufen werden. Bitte Internetverbindung prüfen!"
-        // );
       });
   };
 

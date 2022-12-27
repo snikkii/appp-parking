@@ -9,6 +9,8 @@ import { Ionicons } from "@expo/vector-icons";
 import ParkingAreaDetails from "./src/components/ParkingAreaDetails";
 import { RootSiblingParent } from "react-native-root-siblings";
 import { useGeofenceEvent } from "./src/hooks/useGeofenceEvent";
+import { IParkingArea } from "./src/models/IParkingArea";
+import { IParkingAreaDetails } from "./src/models/IParkingAreaDetails";
 
 const dbConnectionService = new DbConnectionService();
 
@@ -20,8 +22,12 @@ export default function App() {
   const [longUser, setLongUser] = useState(0);
   const [openParkingAreaList, setOpenParkingAreaList] = useState(false);
   const [volume, setVolume] = useState(false);
+  const [parkingAreaData, setParkingAreaData] = useState({} as IParkingArea);
+  const [parkingAreaDetailsData, setParkingAreaDetailsData] = useState(
+    {} as IParkingAreaDetails
+  );
   const MINUTES_MS = 60000; // 1 minute TODO: change to ten minutes when app is finished
-  const parkingAreaNameAndInGeofence = useGeofenceEvent();
+  const geofenceEventData = useGeofenceEvent();
 
   useEffect(() => {
     dbConnectionService.createTables();
@@ -38,9 +44,8 @@ export default function App() {
   }, []);
 
   useEffect(() => {
-    console.log(parkingAreaNameAndInGeofence);
     // TODO: tts
-  }, [parkingAreaNameAndInGeofence]);
+  }, [geofenceEventData]);
 
   const getParkingAreaId = (id: number) => {
     setParkingAreaId(id);
@@ -55,6 +60,16 @@ export default function App() {
 
   const showParkingAreaDetails = (parkingAreaDetails: boolean) => {
     setShowDetails(parkingAreaDetails);
+  };
+
+  const getParkingAreaData = (parkingAreaData: IParkingArea) => {
+    setParkingAreaData(parkingAreaData);
+  };
+
+  const getParkingAreaDetailsData = (
+    parkingAreaDetailData: IParkingAreaDetails
+  ) => {
+    setParkingAreaDetailsData(parkingAreaDetailData);
   };
 
   const getUserPosition = (latUser?: number, longUser?: number) => {
@@ -115,7 +130,8 @@ export default function App() {
             handleShowParkingAreaList={showParkingAreaList}
             handleParkingAreaDescription={showParkingAreaDescription}
             handleParkingAreaDetails={showParkingAreaDetails}
-            handleSetId={getParkingAreaId}
+            handleParkingAreaData={getParkingAreaData}
+            handleParkingAreaDetailData={getParkingAreaDetailsData}
           />
         ) : (
           <ParkingMap
@@ -131,9 +147,11 @@ export default function App() {
             id={parkingAreaId}
             latUser={latUser}
             longUser={longUser}
-            showLetsGo={parkingAreaNameAndInGeofence[1]}
+            geofenceEventData={geofenceEventData}
             handleShowParkingAreaDescription={showParkingAreaDescription}
             handleParkingAreaDetails={showParkingAreaDetails}
+            handleParkingAreaData={getParkingAreaData}
+            handleParkingAreaDetailData={getParkingAreaDetailsData}
           />
         ) : undefined}
 
@@ -141,7 +159,8 @@ export default function App() {
           <ParkingAreaDetails
             dbConnectionService={dbConnectionService}
             handleShowParkingAreaDetails={showParkingAreaDetails}
-            parkingAreaId={parkingAreaId}
+            parkingAreaData={parkingAreaData}
+            parkingAreaDetailsData={parkingAreaDetailsData}
           />
         ) : undefined}
       </View>
@@ -170,8 +189,6 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     width: Dimensions.get("window").width,
     height: Dimensions.get("window").height * 0.1,
-    // paddingTop: 38,
-    // marginBottom: 3,
   },
   oneButtonContainer: {
     width: Dimensions.get("window").width * 0.2,

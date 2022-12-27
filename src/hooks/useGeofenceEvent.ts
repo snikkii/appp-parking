@@ -2,6 +2,9 @@ import * as TaskManager from "expo-task-manager";
 import * as Location from "expo-location";
 import Toast from "react-native-root-toast";
 import { useEffect, useState } from "react";
+import { allParkingAreas } from "../AllParkingAreas";
+import { IParkingArea } from "../models/IParkingArea";
+import { IEventData } from "../models/IEventData";
 
 const GEOFENCE_TASK = "GEOFENCE_TASK";
 
@@ -14,25 +17,48 @@ TaskManager.defineTask(GEOFENCE_TASK, (data: any) => {
 });
 
 export function useGeofenceEvent() {
-  let eventData: string[] = [];
+  const [eventData, setEventData] = useState([] as IEventData[]);
+
+  if (eventData.length === 0) {
+    allParkingAreas.map((parkingArea: IParkingArea) => {
+      eventData.push({
+        parkingAreaName: parkingArea.name,
+        enteredParkingArea: false,
+      });
+    });
+  }
 
   useEffect(() => {
     const handleIsInGeofence = ({ data, error }: any) => {
       if (error) {
         console.error(error);
         Toast.show(
-          "Es gabe in Problem mit der Anzeige der aktuellen Position."
+          "Es gab ein Problem mit der Anzeige der aktuellen Position.",
+          {
+            duration: Toast.durations.LONG,
+            position: Toast.positions.CENTER,
+          }
         );
       }
+      let newEventData = [...eventData];
       if (data.eventType === Location.GeofencingEventType.Enter) {
-        eventData = [data.region.identifier, "true"];
-        console.log("You've entered region:", data.region);
+        newEventData.map((parkingArea: IEventData) => {
+          if (parkingArea.parkingAreaName === data.region.identifier) {
+            parkingArea.enteredParkingArea = true;
+          }
+        });
+        setEventData(newEventData);
         Toast.show("Parkhaus " + data.region.identifier + " ist in der Nähe!", {
           duration: Toast.durations.LONG,
+          position: Toast.positions.CENTER,
         });
       } else if (data.eventType === Location.GeofencingEventType.Exit) {
-        eventData = [data.region.identifier, "false"];
-        console.log("You've left region:", data.region);
+        newEventData.map((parkingArea: IEventData) => {
+          if (parkingArea.parkingAreaName === data.region.identifier) {
+            parkingArea.enteredParkingArea = false;
+          }
+        });
+        setEventData(newEventData);
       }
     };
 

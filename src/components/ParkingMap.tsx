@@ -5,9 +5,7 @@ import * as Location from "expo-location";
 import * as TaskManager from "expo-task-manager";
 import { allParkingAreas } from "../AllParkingAreas";
 import { IParkingArea } from "../models/IParkingArea";
-import { MaterialIcons, FontAwesome5, Ionicons } from "@expo/vector-icons";
-import Toast from "react-native-root-toast";
-import { registerRootComponent } from "expo";
+import { MaterialIcons } from "@expo/vector-icons";
 
 interface IParkingMapProps {
   handleParkingAreaId(id: number): void;

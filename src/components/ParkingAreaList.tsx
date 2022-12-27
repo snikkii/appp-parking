@@ -5,18 +5,22 @@ import {
   View,
   TouchableOpacity,
   FlatList,
+  Alert,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useEffect, useState } from "react";
 import { DbConnectionService } from "../database/DbConnectionService";
 import * as SQLite from "expo-sqlite";
+import { IParkingArea } from "../models/IParkingArea";
+import { IParkingAreaDetails } from "../models/IParkingAreaDetails";
 
 interface IParkingAreaList {
   dbConnectionService: DbConnectionService;
   handleShowParkingAreaList(showParkingAreaList: boolean): void;
   handleParkingAreaDescription(parkingAreaDescription: boolean): void;
   handleParkingAreaDetails(parkingAreaDetails: boolean): void;
-  handleSetId(id: number): void;
+  handleParkingAreaData(parkingAreaData: IParkingArea): void;
+  handleParkingAreaDetailData(parkingAreaDetails: IParkingAreaDetails): void;
 }
 
 export default function ParkingAreaList(props: IParkingAreaList) {
@@ -25,7 +29,8 @@ export default function ParkingAreaList(props: IParkingAreaList) {
     handleShowParkingAreaList,
     handleParkingAreaDescription,
     handleParkingAreaDetails,
-    handleSetId,
+    handleParkingAreaData,
+    handleParkingAreaDetailData,
   } = props;
   const [parkingAreaRows, setParkingAreaRows] = useState(
     {} as SQLite.SQLResultSetRowList
@@ -34,9 +39,10 @@ export default function ParkingAreaList(props: IParkingAreaList) {
 
   const fetchDataFromTable = async () => {
     try {
-      let parkingAreas =
+      let parkingAreasAsList =
         (await dbConnectionService.getParkingAreas()) as SQLite.SQLResultSetRowList;
-      setParkingAreaRows(parkingAreas);
+
+      setParkingAreaRows(parkingAreasAsList);
       setDatabaseError(false);
     } catch (error) {
       console.error(error);
@@ -44,9 +50,28 @@ export default function ParkingAreaList(props: IParkingAreaList) {
     }
   };
 
-  const handleSetValues = (id: number) => {
-    handleParkingAreaDetails(true);
-    handleSetId(id);
+  const handleSetValues = async (id: number) => {
+    try {
+      let parkingAreas = (await dbConnectionService.getDataFromParkingAreaTable(
+        id
+      )) as IParkingArea;
+
+      let parkingAreaDetails =
+        (await dbConnectionService.getDataFromParkingAreaDetailsTable(
+          id
+        )) as IParkingAreaDetails;
+
+      if (parkingAreaDetails.dateOfData == "keine Daten") {
+        Alert.alert("Warnung!", "Es konnten keine Daten gefunden werden.");
+      }
+
+      handleParkingAreaDetails(true);
+      handleParkingAreaData(parkingAreas);
+      handleParkingAreaDetailData(parkingAreaDetails);
+    } catch (error) {
+      console.error(error);
+      Alert.alert("Warnung!", "Es konnten keine Daten gefunden werden.");
+    }
   };
 
   useEffect(() => {
@@ -128,7 +153,6 @@ const styles = StyleSheet.create({
     width: Dimensions.get("window").width,
     height: Dimensions.get("window").height * 0.1,
     justifyContent: "center",
-    // marginTop: 80,
     marginBottom: 0,
   },
   headingIcon: {

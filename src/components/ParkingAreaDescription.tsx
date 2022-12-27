@@ -12,15 +12,18 @@ import { IParkingArea } from "../models/IParkingArea";
 import { IParkingAreaDetails } from "../models/IParkingAreaDetails";
 import { MaterialIcons, Ionicons } from "@expo/vector-icons";
 import Toast from "react-native-root-toast";
+import { IEventData } from "../models/IEventData";
 
 interface IParkingAreaDescription {
   dbConnectionService: DbConnectionService;
   id: number;
   latUser: number;
   longUser: number;
-  showLetsGo: string;
+  geofenceEventData: IEventData[];
   handleShowParkingAreaDescription(parkingAreaDescription: boolean): void;
   handleParkingAreaDetails(parkingAreaDetails: boolean): void;
+  handleParkingAreaData(parkingAreaData: IParkingArea): void;
+  handleParkingAreaDetailData(parkingAreaDetails: IParkingAreaDetails): void;
 }
 
 export default function ParkingAreaDescription(props: IParkingAreaDescription) {
@@ -29,9 +32,11 @@ export default function ParkingAreaDescription(props: IParkingAreaDescription) {
     id,
     latUser,
     longUser,
-    showLetsGo,
+    geofenceEventData,
     handleShowParkingAreaDescription,
     handleParkingAreaDetails,
+    handleParkingAreaData,
+    handleParkingAreaDetailData,
   } = props;
   const [parkingAreaData, setParkingAreaData] = useState({} as IParkingArea);
   const [parkingAreaDetailsData, setParkingAreaDetailsData] = useState(
@@ -39,6 +44,7 @@ export default function ParkingAreaDescription(props: IParkingAreaDescription) {
   );
   const [databaseError, setDatabaseError] = useState(false);
   const [favorite, setFavorite] = useState(0);
+  const [showLetsGoButton, sethowLetsGoButton] = useState(false);
 
   const fetchDataFromTable = async () => {
     try {
@@ -72,21 +78,37 @@ export default function ParkingAreaDescription(props: IParkingAreaDescription) {
     if (favorite == 1) {
       Toast.show("Parkhaus erfolgreich zu Favoriten hinzugefügt!", {
         duration: Toast.durations.SHORT,
+        position: Toast.positions.BOTTOM,
       });
     } else if (favorite == 0) {
       Toast.show("Parkhaus erfolgreich von Favoriten entfernt!", {
         duration: Toast.durations.SHORT,
+        position: Toast.positions.BOTTOM,
       });
     }
+  };
+
+  const handleParkingAreaDetailsData = (showDetails: boolean) => {
+    handleParkingAreaData(parkingAreaData);
+    handleParkingAreaDetailData(parkingAreaDetailsData);
+    handleParkingAreaDetails(showDetails);
+  };
+
+  const showParkingAreaDescription = (showDescription: boolean) => {
+    handleShowParkingAreaDescription(showDescription);
   };
 
   useEffect(() => {
     fetchDataFromTable();
   }, [id, handleParkingAreaDetails]);
 
-  const showParkingAreaDescription = (showDescription: boolean) => {
-    handleShowParkingAreaDescription(showDescription);
-  };
+  useEffect(() => {
+    geofenceEventData.map((parkingArea: IEventData) => {
+      if (parkingArea.parkingAreaName === parkingAreaData.name) {
+        sethowLetsGoButton(parkingArea.enteredParkingArea);
+      }
+    });
+  });
 
   return (
     <View style={styles.container}>
@@ -219,7 +241,9 @@ export default function ParkingAreaDescription(props: IParkingAreaDescription) {
               </View>
             )}
 
-            <TouchableOpacity onPress={() => handleParkingAreaDetails(true)}>
+            <TouchableOpacity
+              onPress={() => handleParkingAreaDetailsData(true)}
+            >
               <View style={styles.item}>
                 <MaterialIcons
                   name="more-horiz"
@@ -231,7 +255,7 @@ export default function ParkingAreaDescription(props: IParkingAreaDescription) {
               </View>
             </TouchableOpacity>
           </View>
-          {showLetsGo === "true" ? (
+          {showLetsGoButton === true ? (
             <TouchableOpacity>
               <View style={styles.navigateItem}>
                 <MaterialIcons
