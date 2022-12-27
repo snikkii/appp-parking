@@ -11,6 +11,7 @@ import { RootSiblingParent } from "react-native-root-siblings";
 import { useGeofenceEvent } from "./src/hooks/useGeofenceEvent";
 import { IParkingArea } from "./src/models/IParkingArea";
 import { IParkingAreaDetails } from "./src/models/IParkingAreaDetails";
+import { colors } from "./src/colors";
 
 const dbConnectionService = new DbConnectionService();
 
@@ -103,7 +104,7 @@ export default function App() {
                 <Ionicons.Button
                   name="volume-high"
                   size={35}
-                  color="white"
+                  color={colors.white}
                   backgroundColor="transparent"
                   onPress={() => setVolume(false)}
                 />
@@ -111,7 +112,7 @@ export default function App() {
                 <Ionicons.Button
                   name="volume-mute"
                   size={35}
-                  color="white"
+                  color={colors.white}
                   backgroundColor="transparent"
                   onPress={() => setVolume(true)}
                 />
@@ -122,7 +123,7 @@ export default function App() {
               <Ionicons.Button
                 name="ios-list-circle"
                 size={35}
-                color="white"
+                color={colors.white}
                 backgroundColor="transparent"
                 onPress={() => setOpenParkingAreaList(true)}
               />
@@ -179,7 +180,7 @@ export default function App() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#2e2d2d",
+    backgroundColor: colors.backgroundGray,
     alignItems: "center",
     justifyContent: "flex-end",
   },
