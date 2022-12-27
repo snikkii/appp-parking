@@ -1,4 +1,5 @@
 import { StyleSheet, Text, Dimensions, View } from "react-native";
+import { colors } from "../colors";
 
 interface IParkingAreaDetailsItem {
   errorStyle: boolean;
@@ -42,8 +43,8 @@ const styles = StyleSheet.create({
     margin: 5,
     borderWidth: 2,
     borderRadius: 10,
-    borderColor: "#fd526c",
-    backgroundColor: "#fd526c",
+    borderColor: colors.warningRed,
+    backgroundColor: colors.warningRed,
     padding: 10,
   },
   listViewItem: {
@@ -53,8 +54,8 @@ const styles = StyleSheet.create({
     margin: 5,
     borderWidth: 2,
     borderRadius: 10,
-    borderColor: "#7b7a7a",
-    backgroundColor: "#7b7a7a",
+    borderColor: colors.lighterGrey,
+    backgroundColor: colors.lighterGrey,
     padding: 10,
   },
   listItem: {
@@ -62,17 +63,17 @@ const styles = StyleSheet.create({
     justifyContent: "flex-start",
   },
   listHeadingAlt: {
-    color: "#d2d0d0",
+    color: colors.brightGrey,
     fontSize: 15,
     alignItems: "flex-start",
   },
   listHeading: {
-    color: "#a2cfcd",
+    color: colors.babyBlue,
     fontSize: 15,
     alignItems: "flex-start",
   },
   listText: {
-    color: "#fff",
+    color: colors.white,
     fontSize: 20,
     alignItems: "flex-start",
   },

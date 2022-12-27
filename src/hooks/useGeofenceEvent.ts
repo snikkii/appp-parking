@@ -5,12 +5,11 @@ import { useEffect, useState } from "react";
 import { allParkingAreas } from "../AllParkingAreas";
 import { IParkingArea } from "../models/IParkingArea";
 import { IEventData } from "../models/IEventData";
-
-const GEOFENCE_TASK = "GEOFENCE_TASK";
+import { configStrings, errorMessages, outputText } from "../strings";
 
 let geofenceHandles: TaskManager.TaskManagerTaskExecutor[] = [];
 
-TaskManager.defineTask(GEOFENCE_TASK, (data: any) => {
+TaskManager.defineTask(configStrings.geofenceTask, (data: any) => {
   for (const handle of geofenceHandles) {
     handle(data);
   }
@@ -32,13 +31,10 @@ export function useGeofenceEvent() {
     const handleIsInGeofence = ({ data, error }: any) => {
       if (error) {
         console.error(error);
-        Toast.show(
-          "Es gab ein Problem mit der Anzeige der aktuellen Position.",
-          {
-            duration: Toast.durations.LONG,
-            position: Toast.positions.CENTER,
-          }
-        );
+        Toast.show(errorMessages.noCurrentPosition, {
+          duration: Toast.durations.LONG,
+          position: Toast.positions.CENTER,
+        });
       }
       let newEventData = [...eventData];
       if (data.eventType === Location.GeofencingEventType.Enter) {
@@ -48,7 +44,7 @@ export function useGeofenceEvent() {
           }
         });
         setEventData(newEventData);
-        Toast.show("Parkhaus " + data.region.identifier + " ist in der Nähe!", {
+        Toast.show(outputText.inGeofenceMessage + data.region.identifier, {
           duration: Toast.durations.LONG,
           position: Toast.positions.CENTER,
         });

@@ -6,6 +6,7 @@ import { XMLParser } from "fast-xml-parser";
 import { decode } from "html-entities";
 import { IParkingAreaDetails } from "../models/IParkingAreaDetails";
 import Toast from "react-native-root-toast";
+import { configStrings, errorMessages, sqlQuerys } from "../strings";
 
 export class DbConnectionService {
   public parkingAreaDb!:
@@ -39,44 +40,34 @@ export class DbConnectionService {
       (tx) => {
         // tx.executeSql("drop table parkingdetails");
         // tx.executeSql("drop table parkingarea");
-        tx.executeSql(
-          "create table if not exists parkingarea (id integer primary key not null, name string, address string, openingHours string, pricePerHour string, doorHeight string, favorite number, lat number, long number);"
-        );
-        tx.executeSql("select * from parkingarea", [], (_, { rows }) => {
+        tx.executeSql(sqlQuerys.createTableParkingArea);
+        tx.executeSql(sqlQuerys.selectAllFromParkingArea, [], (_, { rows }) => {
           if (rows.length == 0) {
             allParkingAreas.map((parkingArea: IParkingArea) =>
-              tx.executeSql(
-                "insert into parkingarea (name, address, openingHours, pricePerHour, doorHeight, favorite, lat, long) values (?, ?, ?, ?, ?, ?, ?, ?)",
-                [
-                  parkingArea.name,
-                  parkingArea.address,
-                  parkingArea.openingHours,
-                  parkingArea.pricePerHour,
-                  parkingArea.doorHeight,
-                  parkingArea.favorite,
-                  parkingArea.lat,
-                  parkingArea.long,
-                ]
-              )
+              tx.executeSql(sqlQuerys.insertAllDataIntoParkingArea, [
+                parkingArea.name,
+                parkingArea.address,
+                parkingArea.openingHours,
+                parkingArea.pricePerHour,
+                parkingArea.doorHeight,
+                parkingArea.favorite,
+                parkingArea.lat,
+                parkingArea.long,
+              ])
             );
           }
         });
-        tx.executeSql(
-          "create table if not exists parkingdetails (id integer primary key not null, parkingAreaId number, numberOfLots number, numberOfTakenLots number, numberOfFreeLots number, trend number, status string, closed number, dateOfData string);"
-        );
+        tx.executeSql(sqlQuerys.createTableParkingAreaDetails);
       },
       (error) => {
         console.error(error);
-        Alert.alert(
-          "Warnung!",
-          "Es gab ein Problem mit der Datenbank. Bitte App neu starten!"
-        );
+        Alert.alert(errorMessages.warning, errorMessages.databaseProblem);
       }
     );
   };
 
   public getData = () => {
-    fetch("http://parken.amberg.de/wp-content/uploads/pls/pls.xml")
+    fetch(configStrings.parkingAreaDetailsApi)
       .then((response) => response.text())
       .then((textResponse) => {
         const parser = new XMLParser();
@@ -102,13 +93,10 @@ export class DbConnectionService {
       })
       .catch((error) => {
         console.error(error);
-        Toast.show(
-          "Die aktuellen Parkhausdaten konnten nicht abgerufen werden. Bitte Internetverbindung prüfen!",
-          {
-            duration: Toast.durations.LONG,
-            position: Toast.positions.BOTTOM,
-          }
-        );
+        Toast.show(errorMessages.noApiConnectionMessage, {
+          duration: Toast.durations.LONG,
+          position: Toast.positions.BOTTOM,
+        });
       });
   };
 
@@ -128,7 +116,7 @@ export class DbConnectionService {
     this.parkingAreaDb.transaction(
       (tx) => {
         tx.executeSql(
-          "select id from parkingarea where name = ?",
+          sqlQuerys.selectIdFromParkingAreaWithName,
           [name],
           (_, { rows }) => (id = rows._array[0]["id"])
         );
@@ -136,30 +124,24 @@ export class DbConnectionService {
       (error) => {
         console.error(error);
         if (ctr == 1) {
-          Alert.alert(
-            "Warnung!",
-            "Es gab ein Problem mit der Datenbank. Bitte App neu starten!"
-          );
+          Alert.alert(errorMessages.warning, errorMessages.databaseProblem);
         }
       }
     );
     this.parkingAreaDb.transaction(
       (tx) => {
+        tx.executeSql(sqlQuerys.insertIntoParkingAreaDetails, [
+          id,
+          numberOfLots,
+          numberOfTakenLots,
+          numberOfFreeLots,
+          trend,
+          status,
+          closed,
+          dateOfData,
+        ]);
         tx.executeSql(
-          "insert into parkingdetails (parkingAreaId, numberOfLots, numberOfTakenLots, numberOfFreeLots, trend, status, closed, dateOfData) values (?, ?, ?, ?, ?, ?, ?, ?)",
-          [
-            id,
-            numberOfLots,
-            numberOfTakenLots,
-            numberOfFreeLots,
-            trend,
-            status,
-            closed,
-            dateOfData,
-          ]
-        );
-        tx.executeSql(
-          "select * from parkingdetails where parkingAreaId = ? order by dateOfData asc",
+          sqlQuerys.selectAllFromParkingAreaDetailsWithId,
           [id],
           (_, { rows }) => {
             if (rows.length >= 4) {
@@ -171,27 +153,21 @@ export class DbConnectionService {
       (error) => {
         console.error(error);
         if (ctr == 1) {
-          Alert.alert(
-            "Warnung!",
-            "Es gab ein Problem mit der Datenbank. Bitte App neu starten!"
-          );
+          Alert.alert(errorMessages.warning, errorMessages.databaseProblem);
         }
       }
     );
     this.parkingAreaDb.transaction(
       (tx) => {
-        tx.executeSql(
-          "delete from parkingdetails where parkingAreaId = ? and dateOfData = ?",
-          [id, toDelete]
-        );
+        tx.executeSql(sqlQuerys.deleteOldRecordFromParkingAreaDetails, [
+          id,
+          toDelete,
+        ]);
       },
       (error) => {
         console.error(error);
         if (ctr == 1) {
-          Alert.alert(
-            "Warnung!",
-            "Es gab ein Problem mit der Datenbank. Bitte App neu starten!"
-          );
+          Alert.alert(errorMessages.warning, errorMessages.databaseProblem);
         }
       }
     );
@@ -203,7 +179,7 @@ export class DbConnectionService {
       this.parkingAreaDb.transaction(
         (tx) => {
           tx.executeSql(
-            "select * from parkingarea where id = ?",
+            sqlQuerys.selectAllFromParkingAreaWithId,
             [parkingAreaId],
             (tx, result) => {
               parkingAreaDetails.name = result.rows.item(0).name;
@@ -233,7 +209,7 @@ export class DbConnectionService {
       this.parkingAreaDb.transaction(
         (tx) => {
           tx.executeSql(
-            "select * from parkingdetails where parkingAreaId = ? order by dateOfData desc limit 1",
+            sqlQuerys.selectAllFromParkingAreaDetailsWithIdLimit1,
             [parkingAreaId],
             (tx, result) => {
               if (result.rows.length > 0) {
@@ -272,7 +248,7 @@ export class DbConnectionService {
       this.parkingAreaDb.transaction(
         (tx) => {
           tx.executeSql(
-            "select * from parkingarea order by favorite desc, name asc",
+            sqlQuerys.selectAllFromParkingAreaOrderByFavoriteAndName,
             [],
             (tx, result) => {
               resolve(result.rows);
@@ -290,7 +266,7 @@ export class DbConnectionService {
     this.parkingAreaDb.transaction(
       (tx) => {
         tx.executeSql(
-          "update parkingarea set favorite = ? where name = ?",
+          sqlQuerys.updateParkingArea,
           [favorite, name],
           (tx, result) => {}
         );

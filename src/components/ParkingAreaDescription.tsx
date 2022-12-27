@@ -13,6 +13,8 @@ import { IParkingAreaDetails } from "../models/IParkingAreaDetails";
 import { MaterialIcons, Ionicons } from "@expo/vector-icons";
 import Toast from "react-native-root-toast";
 import { IEventData } from "../models/IEventData";
+import { errorMessages, outputText } from "../strings";
+import { colors } from "../colors";
 
 interface IParkingAreaDescription {
   dbConnectionService: DbConnectionService;
@@ -64,8 +66,8 @@ export default function ParkingAreaDescription(props: IParkingAreaDescription) {
       setFavorite(parkingAreas.favorite);
       setDatabaseError(false);
 
-      if (parkingAreaDetails.dateOfData == "keine Daten") {
-        Alert.alert("Warnung!", "Es konnten keine Daten gefunden werden.");
+      if (parkingAreaDetails.dateOfData === "keine Daten") {
+        Alert.alert(errorMessages.warning, errorMessages.databaseProblem);
         showParkingAreaDescription(false);
       }
     } catch (error) {
@@ -75,18 +77,25 @@ export default function ParkingAreaDescription(props: IParkingAreaDescription) {
   };
 
   const setFavoriteParkingArea = (favorite: number) => {
-    dbConnectionService.setFavoriteParkingArea(favorite, parkingAreaData.name);
-    setFavorite(favorite);
-    if (favorite == 1) {
-      Toast.show("Parkhaus erfolgreich zu Favoriten hinzugefügt!", {
-        duration: Toast.durations.SHORT,
-        position: Toast.positions.BOTTOM,
-      });
-    } else if (favorite == 0) {
-      Toast.show("Parkhaus erfolgreich von Favoriten entfernt!", {
-        duration: Toast.durations.SHORT,
-        position: Toast.positions.BOTTOM,
-      });
+    try {
+      dbConnectionService.setFavoriteParkingArea(
+        favorite,
+        parkingAreaData.name
+      );
+      setFavorite(favorite);
+      if (favorite == 1) {
+        Toast.show(outputText.successAddedToFavorites, {
+          duration: Toast.durations.SHORT,
+          position: Toast.positions.BOTTOM,
+        });
+      } else if (favorite == 0) {
+        Toast.show(outputText.failAddedToFavorites, {
+          duration: Toast.durations.SHORT,
+          position: Toast.positions.BOTTOM,
+        });
+      }
+    } catch (error) {
+      Alert.alert(errorMessages.warning, errorMessages.databaseProblem);
     }
   };
 
@@ -124,7 +133,7 @@ export default function ParkingAreaDescription(props: IParkingAreaDescription) {
                 style={styles.favoriteIcons}
                 name="ios-warning"
                 size={25}
-                color="#fff"
+                color={colors.white}
                 backgroundColor="transparent"
               />
             </View>
@@ -132,14 +141,12 @@ export default function ParkingAreaDescription(props: IParkingAreaDescription) {
               style={styles.headingIcon}
               name="close-circle"
               size={30}
-              color="#fff"
+              color={colors.white}
               backgroundColor="transparent"
               onPress={() => showParkingAreaDescription(false)}
             />
           </View>
-          <Text style={styles.text}>
-            Die Daten konnten nicht abgerufen werden.
-          </Text>
+          <Text style={styles.text}>{errorMessages.databaseProblem}</Text>
         </View>
       ) : (
         <View style={styles.container}>
@@ -152,7 +159,7 @@ export default function ParkingAreaDescription(props: IParkingAreaDescription) {
                   style={styles.favoriteIcons}
                   name="ios-heart"
                   size={25}
-                  color="#a66378"
+                  color={colors.favoritePink}
                   backgroundColor="transparent"
                   onPress={() => setFavoriteParkingArea(0)}
                 />
@@ -161,7 +168,7 @@ export default function ParkingAreaDescription(props: IParkingAreaDescription) {
                   style={styles.favoriteIcons}
                   name="ios-heart-outline"
                   size={25}
-                  color="#a66378"
+                  color={colors.favoritePink}
                   backgroundColor="transparent"
                   onPress={() => setFavoriteParkingArea(1)}
                 />
@@ -171,7 +178,7 @@ export default function ParkingAreaDescription(props: IParkingAreaDescription) {
               style={styles.headingIcon}
               name="close-circle"
               size={30}
-              color="#fff"
+              color={colors.white}
               backgroundColor="transparent"
               onPress={() => showParkingAreaDescription(false)}
             />
@@ -182,7 +189,7 @@ export default function ParkingAreaDescription(props: IParkingAreaDescription) {
                 <MaterialIcons
                   name="trending-neutral"
                   size={30}
-                  color="#c7935a"
+                  color={colors.trendNeutral}
                   backgroundColor="transparent"
                 />
               ) : undefined}
@@ -190,7 +197,7 @@ export default function ParkingAreaDescription(props: IParkingAreaDescription) {
                 <MaterialIcons
                   name="trending-down"
                   size={30}
-                  color="#00c9c8"
+                  color={colors.trendDown}
                   backgroundColor="transparent"
                 />
               ) : undefined}
@@ -198,31 +205,35 @@ export default function ParkingAreaDescription(props: IParkingAreaDescription) {
                 <MaterialIcons
                   name="trending-up"
                   size={30}
-                  color="#fd526c"
+                  color={colors.warningRed}
                   backgroundColor="transparent"
                 />
               ) : undefined}
               <Text style={styles.text}>
-                {parkingAreaDetailsData.numberOfFreeLots} frei
+                {parkingAreaDetailsData.numberOfFreeLots + outputText.freeLots}
               </Text>
             </View>
             <View style={styles.item}>
               <MaterialIcons
                 name="euro"
                 size={30}
-                color="#2e2d2d"
+                color={colors.backgroundGray}
                 backgroundColor="transparent"
               />
-              <Text style={styles.text}>{parkingAreaData.pricePerHour}/h</Text>
+              <Text style={styles.text}>
+                {parkingAreaData.pricePerHour + outputText.perHour}
+              </Text>
             </View>
             <View style={styles.item}>
               <Ionicons
                 name="ios-time"
                 size={30}
-                color="#2e2d2d"
+                color={colors.backgroundGray}
                 backgroundColor="transparent"
               />
-              <Text style={styles.text}>{parkingAreaData.openingHours}h</Text>
+              <Text style={styles.text}>
+                {parkingAreaData.openingHours + outputText.hour}
+              </Text>
             </View>
             {parkingAreaData.doorHeight === "" ? undefined : (
               <View style={styles.item}>
@@ -230,17 +241,19 @@ export default function ParkingAreaDescription(props: IParkingAreaDescription) {
                   <MaterialIcons
                     name="height"
                     size={30}
-                    color="#2e2d2d"
+                    color={colors.backgroundGray}
                     backgroundColor="transparent"
                   />
                   <MaterialIcons
                     name="directions-car"
                     size={30}
-                    color="#2e2d2d"
+                    color={colors.backgroundGray}
                     backgroundColor="transparent"
                   />
                 </View>
-                <Text style={styles.text}>{parkingAreaData.doorHeight}m</Text>
+                <Text style={styles.text}>
+                  {parkingAreaData.doorHeight + outputText.meters}
+                </Text>
               </View>
             )}
             <TouchableOpacity
@@ -250,10 +263,10 @@ export default function ParkingAreaDescription(props: IParkingAreaDescription) {
                 <MaterialIcons
                   name="more-horiz"
                   size={30}
-                  color="#2e2d2d"
+                  color={colors.backgroundGray}
                   backgroundColor="transparent"
                 />
-                <Text style={styles.text}>Mehr</Text>
+                <Text style={styles.text}>{outputText.more}</Text>
               </View>
             </TouchableOpacity>
           </View>
@@ -263,10 +276,10 @@ export default function ParkingAreaDescription(props: IParkingAreaDescription) {
                 <MaterialIcons
                   name="directions"
                   size={30}
-                  color="#2e2d2d"
+                  color={colors.backgroundGray}
                   backgroundColor="transparent"
                 />
-                <Text style={styles.text}>Los</Text>
+                <Text style={styles.text}>{outputText.letsGo}</Text>
               </View>
             </TouchableOpacity>
           ) : undefined}
@@ -278,13 +291,13 @@ export default function ParkingAreaDescription(props: IParkingAreaDescription) {
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: "#2e2d2d",
+    backgroundColor: colors.backgroundGray,
     alignItems: "center",
     justifyContent: "flex-start",
     height: Dimensions.get("window").height * 0.3,
   },
   warningContainer: {
-    backgroundColor: "#fd526c",
+    backgroundColor: colors.warningRed,
     alignItems: "center",
     justifyContent: "flex-start",
     height: Dimensions.get("window").height * 0.3,
@@ -298,8 +311,8 @@ const styles = StyleSheet.create({
     flexDirection: "column",
     width: Dimensions.get("window").width * 0.16,
     height: Dimensions.get("window").height * 0.1,
-    borderColor: "#fff",
-    backgroundColor: "#fff",
+    borderColor: colors.white,
+    backgroundColor: colors.white,
     borderWidth: 2,
     borderRadius: 10,
     margin: 5,
@@ -311,8 +324,8 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     width: Dimensions.get("window").width * 0.9,
     height: Dimensions.get("window").height * 0.05,
-    borderColor: "#d3fbd8",
-    backgroundColor: "#d3fbd8",
+    borderColor: colors.okayGreen,
+    backgroundColor: colors.okayGreen,
     borderWidth: 2,
     borderRadius: 10,
     margin: 5,
@@ -324,8 +337,8 @@ const styles = StyleSheet.create({
     flexDirection: "row",
   },
   text: {
-    color: "#2e2d2d",
-    fontSize: 15,
+    color: colors.backgroundGray,
+    fontSize: 13,
   },
   headingContainer: {
     flexDirection: "row",
@@ -347,14 +360,14 @@ const styles = StyleSheet.create({
     margin: 0,
     marginTop: 5,
     marginRight: 0,
-    color: "#fff",
+    color: colors.white,
   },
   heading: {
     marginLeft: 30,
     marginTop: 15,
     marginBottom: 15,
     marginRight: 0,
-    color: "#fff",
+    color: colors.white,
     fontSize: 25,
   },
 });

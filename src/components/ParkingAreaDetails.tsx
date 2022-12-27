@@ -1,4 +1,4 @@
-import { StyleSheet, Dimensions, View } from "react-native";
+import { StyleSheet, Dimensions, View, Alert } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { DbConnectionService } from "../database/DbConnectionService";
 import { IParkingArea } from "../models/IParkingArea";
@@ -7,6 +7,8 @@ import { IParkingAreaDetails } from "../models/IParkingAreaDetails";
 import Toast from "react-native-root-toast";
 import ParkingAreaListHeading from "./ParkingAreaListHeading";
 import ParkingAreaDetailsItem from "./ParkingAreaDetailsItem";
+import { errorMessages, outputText } from "../strings";
+import { colors } from "../colors";
 
 interface IParkingAreaDetailsList {
   dbConnectionService: DbConnectionService;
@@ -33,27 +35,34 @@ export default function ParkingAreaList(props: IParkingAreaDetailsList) {
   useEffect(() => {
     setFavorite(parkingAreaData.favorite);
     if (parkingAreaDetailsData.trend === -1) {
-      setTrend("Fallend");
+      setTrend(outputText.trendDown);
     } else if (parkingAreaDetailsData.trend === 0) {
-      setTrend("Gleichbleibend");
+      setTrend(outputText.trendNeutral);
     } else if (parkingAreaDetailsData.trend === 1) {
-      setTrend("Steigend");
+      setTrend(outputText.trendUp);
     }
   }, [parkingAreaData]);
 
   const setFavoriteParkingArea = (favorite: number) => {
-    dbConnectionService.setFavoriteParkingArea(favorite, parkingAreaData.name);
-    setFavorite(favorite);
-    if (favorite == 1) {
-      Toast.show("Parkhaus erfolgreich zu Favoriten hinzugefügt!", {
-        duration: Toast.durations.SHORT,
-        position: Toast.positions.BOTTOM,
-      });
-    } else if (favorite == 0) {
-      Toast.show("Parkhaus erfolgreich von Favoriten entfernt!", {
-        duration: Toast.durations.SHORT,
-        position: Toast.positions.BOTTOM,
-      });
+    try {
+      dbConnectionService.setFavoriteParkingArea(
+        favorite,
+        parkingAreaData.name
+      );
+      setFavorite(favorite);
+      if (favorite == 1) {
+        Toast.show(outputText.successAddedToFavorites, {
+          duration: Toast.durations.SHORT,
+          position: Toast.positions.BOTTOM,
+        });
+      } else if (favorite == 0) {
+        Toast.show(outputText.failAddedToFavorites, {
+          duration: Toast.durations.SHORT,
+          position: Toast.positions.BOTTOM,
+        });
+      }
+    } catch (error) {
+      Alert.alert(errorMessages.warning, errorMessages.databaseProblem);
     }
   };
 
@@ -64,21 +73,21 @@ export default function ParkingAreaList(props: IParkingAreaDetailsList) {
           <View style={styles.outerHeadingContainer}>
             <ParkingAreaListHeading
               arrowBackFunction={showParkingAreaDetails}
-              headingText={"Achtung!"}
+              headingText={errorMessages.attention}
             />
             <Ionicons.Button
               style={styles.icons}
               name="ios-warning"
               size={40}
-              color="#fff"
+              color={colors.white}
               backgroundColor="transparent"
             />
           </View>
           <View style={styles.listContainer}>
             <ParkingAreaDetailsItem
               errorStyle={true}
-              headingText={"Fehler"}
-              bodyText={["Die Daten konnten nicht angerufen werden."]}
+              headingText={errorMessages.attentionText}
+              bodyText={[errorMessages.databaseProblem]}
             />
           </View>
         </View>
@@ -95,7 +104,7 @@ export default function ParkingAreaList(props: IParkingAreaDetailsList) {
                 style={styles.icons}
                 name="ios-heart"
                 size={40}
-                color="#a66378"
+                color={colors.favoritePink}
                 backgroundColor="transparent"
                 onPress={() => setFavoriteParkingArea(0)}
               />
@@ -104,7 +113,7 @@ export default function ParkingAreaList(props: IParkingAreaDetailsList) {
                 style={styles.icons}
                 name="ios-heart-outline"
                 size={40}
-                color="#a66378"
+                color={colors.favoritePink}
                 backgroundColor="transparent"
                 onPress={() => setFavoriteParkingArea(1)}
               />
@@ -115,16 +124,16 @@ export default function ParkingAreaList(props: IParkingAreaDetailsList) {
             {parkingAreaDetailsData.closed === 1 ? (
               <ParkingAreaDetailsItem
                 errorStyle={true}
-                headingText={"Geschlossen"}
-                bodyText={[
-                  "Parkhaus ist derzeit geschlossen und kann nicht befahren werden.",
-                ]}
+                headingText={outputText.closed}
+                bodyText={[errorMessages.closedText]}
               />
             ) : (
               <ParkingAreaDetailsItem
                 errorStyle={false}
-                headingText={"Geöffnet"}
-                bodyText={[parkingAreaData.openingHours + " Stunden"]}
+                headingText={outputText.open}
+                bodyText={[
+                  parkingAreaData.openingHours + outputText.openedText,
+                ]}
               />
             )}
 
@@ -132,7 +141,7 @@ export default function ParkingAreaList(props: IParkingAreaDetailsList) {
             parkingAreaData.address === undefined ? undefined : (
               <ParkingAreaDetailsItem
                 errorStyle={false}
-                headingText={"Einfahrt über"}
+                headingText={outputText.address}
                 bodyText={[parkingAreaData.address]}
               />
             )}
@@ -141,8 +150,10 @@ export default function ParkingAreaList(props: IParkingAreaDetailsList) {
             parkingAreaData.doorHeight === undefined ? undefined : (
               <ParkingAreaDetailsItem
                 errorStyle={false}
-                headingText={"Einfahrtshöhe"}
-                bodyText={[parkingAreaData.doorHeight + "m"]}
+                headingText={outputText.doorHeight}
+                bodyText={[
+                  parkingAreaData.doorHeight + outputText.doorHeightText,
+                ]}
               />
             )}
 
@@ -150,26 +161,26 @@ export default function ParkingAreaList(props: IParkingAreaDetailsList) {
             parkingAreaData.pricePerHour === undefined ? undefined : (
               <ParkingAreaDetailsItem
                 errorStyle={false}
-                headingText={"Kosten pro Stunde"}
-                bodyText={[parkingAreaData.pricePerHour + "€"]}
+                headingText={outputText.price}
+                bodyText={[parkingAreaData.pricePerHour + outputText.priceText]}
               />
             )}
 
             <ParkingAreaDetailsItem
               errorStyle={false}
-              headingText={"Parkplätze"}
+              headingText={outputText.lots}
               bodyText={[
-                "Gesamt: " + parkingAreaDetailsData.numberOfLots,
-                "Belegt: " + parkingAreaDetailsData.numberOfTakenLots,
-                "Frei: " + parkingAreaDetailsData.numberOfFreeLots,
-                "Trend: " + trend,
+                outputText.lotsAll + parkingAreaDetailsData.numberOfLots,
+                outputText.lotsTaken + parkingAreaDetailsData.numberOfTakenLots,
+                outputText.lotsFree + parkingAreaDetailsData.numberOfFreeLots,
+                outputText.lotsTrend + trend,
               ]}
             />
 
             {parkingAreaDetailsData.status !== "OK" ? (
               <ParkingAreaDetailsItem
                 errorStyle={true}
-                headingText={"Aktueller Status"}
+                headingText={outputText.currentStatus}
                 bodyText={[parkingAreaDetailsData.status]}
               />
             ) : undefined}
@@ -184,8 +195,8 @@ const styles = StyleSheet.create({
     flexDirection: "column",
     width: Dimensions.get("window").width,
     height: Dimensions.get("window").height,
-    borderColor: "#535252",
-    backgroundColor: "#535252",
+    borderColor: colors.detailsGrey,
+    backgroundColor: colors.detailsGrey,
     borderWidth: 2,
     borderRadius: 10,
   },

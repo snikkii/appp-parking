@@ -6,6 +6,8 @@ import * as TaskManager from "expo-task-manager";
 import { allParkingAreas } from "../AllParkingAreas";
 import { IParkingArea } from "../models/IParkingArea";
 import { MaterialIcons } from "@expo/vector-icons";
+import { configStrings, errorMessages } from "../strings";
+import { colors } from "../colors";
 
 interface IParkingMapProps {
   handleParkingAreaId(id: number): void;
@@ -13,8 +15,6 @@ interface IParkingMapProps {
   handleUserPosition(latUser?: number, longUser?: number): void;
   mapStyle: StyleProp<ViewStyle>;
 }
-
-const GEOFENCE_TASK = "GEOFENCE_TASK";
 
 export function ParkingMap(props: IParkingMapProps) {
   const {
@@ -26,7 +26,6 @@ export function ParkingMap(props: IParkingMapProps) {
   const [location, setLocation] = useState<Location.LocationObject | null>(
     null
   );
-  const [errorMessage, setErrorMessage] = useState("");
 
   let regions: Location.LocationRegion[] = [];
 
@@ -43,10 +42,7 @@ export function ParkingMap(props: IParkingMapProps) {
     (async () => {
       let { status } = await Location.requestForegroundPermissionsAsync();
       if (status !== "granted") {
-        setErrorMessage(
-          "Zugriff auf aktuelle Position wurde nicht gestattet. Die aktuelle Position und Parkhäuser in der Nähe können nicht angezeigt werden!"
-        );
-        Alert.alert("Achtung!", errorMessage);
+        Alert.alert(errorMessages.attention, errorMessages.deniedPermission);
         return;
       }
       let location = await Location.getCurrentPositionAsync({});
@@ -56,19 +52,16 @@ export function ParkingMap(props: IParkingMapProps) {
     (async () => {
       let { status } = await Location.requestBackgroundPermissionsAsync();
       if (status !== "granted") {
-        setErrorMessage(
-          "Zugriff auf aktuelle Position wurde nicht gestattet. Die aktuelle Position und Parkhäuser in der Nähe können nicht angezeigt werden!"
-        );
-        Alert.alert("Achtung!", errorMessage);
+        Alert.alert(errorMessages.attention, errorMessages.deniedPermission);
         return;
       }
     })();
 
-    if (TaskManager.isTaskDefined(GEOFENCE_TASK)) {
-      Location.startGeofencingAsync(GEOFENCE_TASK, regions);
+    if (TaskManager.isTaskDefined(configStrings.geofenceTask)) {
+      Location.startGeofencingAsync(configStrings.geofenceTask, regions);
     } else {
       setTimeout(() => {
-        Location.startGeofencingAsync(GEOFENCE_TASK, regions);
+        Location.startGeofencingAsync(configStrings.geofenceTask, regions);
       }, 5000);
     }
   }, []);
@@ -145,7 +138,8 @@ export function ParkingMap(props: IParkingMapProps) {
             <MaterialIcons
               name="location-on"
               size={50}
-              color="#00adad"
+              // color="#00adad"
+              color={colors.markerBlue}
               backgroundColor="transparent"
             />
             {/* <FontAwesome5

@@ -1,5 +1,6 @@
 import { StyleSheet, Text, Dimensions, View } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
+import { colors } from "../colors";
 
 interface IParkingAreaListHeading {
   arrowBackFunction(showView: boolean): void;
@@ -15,7 +16,7 @@ export default function ParkingAreaListHeading(props: IParkingAreaListHeading) {
         style={styles.headingIcon}
         name="ios-arrow-back"
         size={40}
-        color="#fff"
+        color={colors.white}
         backgroundColor="transparent"
         onPress={() => arrowBackFunction(false)}
       />
@@ -43,7 +44,7 @@ const styles = StyleSheet.create({
     width: Dimensions.get("window").width * 0.6,
     height: Dimensions.get("window").height * 0.1,
     marginTop: 35,
-    color: "#fff",
+    color: colors.white,
     fontSize: 30,
   },
 });

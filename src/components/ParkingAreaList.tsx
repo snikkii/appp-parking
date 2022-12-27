@@ -15,6 +15,8 @@ import { IParkingArea } from "../models/IParkingArea";
 import { IParkingAreaDetails } from "../models/IParkingAreaDetails";
 import ParkingAreaListHeading from "./ParkingAreaListHeading";
 import ParkingAreaListItem from "./ParkingAreaListItem";
+import { errorMessages, outputText } from "../strings";
+import { colors } from "../colors";
 
 interface IParkingAreaList {
   dbConnectionService: DbConnectionService;
@@ -65,8 +67,8 @@ export default function ParkingAreaList(props: IParkingAreaList) {
           id
         )) as IParkingAreaDetails;
 
-      if (parkingAreaDetails.dateOfData == "keine Daten") {
-        Alert.alert("Warnung!", "Es konnten keine Daten gefunden werden.");
+      if (parkingAreaDetails.dateOfData === "keine Daten") {
+        Alert.alert(errorMessages.warning, errorMessages.databaseProblem);
       }
 
       handleParkingAreaDetails(true);
@@ -76,7 +78,7 @@ export default function ParkingAreaList(props: IParkingAreaList) {
     } catch (error) {
       console.error(error);
       handleDataBaseError(true);
-      Alert.alert("Warnung!", "Es konnten keine Daten gefunden werden.");
+      Alert.alert(errorMessages.warning, errorMessages.databaseProblem);
     }
   };
 
@@ -93,7 +95,7 @@ export default function ParkingAreaList(props: IParkingAreaList) {
     <View style={styles.container}>
       <ParkingAreaListHeading
         arrowBackFunction={showParkingAreaList}
-        headingText={"Parkhäuser"}
+        headingText={outputText.headingList}
       />
       <View style={styles.listContainer}>
         {!databaseError ? (
@@ -111,14 +113,12 @@ export default function ParkingAreaList(props: IParkingAreaList) {
           />
         ) : (
           <View style={styles.warnItem}>
-            <Text style={styles.warnText}>
-              Die Parkhäuser können aktuell nicht angezeigt werden.
-            </Text>
+            <Text style={styles.warnText}>{errorMessages.noParkingAreas}</Text>
             <Ionicons.Button
               style={styles.icons}
               name="ios-warning"
               size={40}
-              color="#2e2d2d"
+              color={colors.backgroundGray}
               backgroundColor="transparent"
             />
           </View>
@@ -156,15 +156,15 @@ const styles = StyleSheet.create({
     flexWrap: "wrap",
     flexDirection: "row",
     margin: 10,
-    color: "#2e2d2d",
+    color: colors.backgroundGray,
     fontSize: 16,
   },
   warnItem: {
     flexDirection: "row",
     width: Dimensions.get("window").width * 0.9,
     height: Dimensions.get("window").height * 0.1,
-    borderColor: "#fd526c",
-    backgroundColor: "#fd526c",
+    borderColor: colors.warningRed,
+    backgroundColor: colors.warningRed,
     borderWidth: 2,
     borderRadius: 10,
     margin: 5,

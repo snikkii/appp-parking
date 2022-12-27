@@ -6,6 +6,7 @@ import {
   TouchableOpacity,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
+import { colors } from "../colors";
 
 interface IParkingAreaListItem {
   onPressFunction(id: number): void;
@@ -28,7 +29,7 @@ export default function ParkingAreaListItem(props: IParkingAreaListItem) {
                 style={styles.icons}
                 name="ios-heart"
                 size={25}
-                color="#a66378"
+                color={colors.favoritePink}
                 backgroundColor="transparent"
               />
             ) : undefined}
@@ -53,8 +54,8 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     width: Dimensions.get("window").width * 0.8,
     height: Dimensions.get("window").height * 0.1,
-    borderColor: "#fff",
-    backgroundColor: "#fff",
+    borderColor: colors.white,
+    backgroundColor: colors.white,
     borderWidth: 2,
     borderRadius: 10,
     margin: 5,
@@ -63,7 +64,7 @@ const styles = StyleSheet.create({
   },
   listText: {
     margin: 10,
-    color: "#2e2d2d",
+    color: colors.backgroundGray,
     fontSize: 25,
     alignItems: "center",
   },
