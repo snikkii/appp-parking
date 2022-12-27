@@ -24,6 +24,7 @@ interface IParkingAreaDescription {
   handleParkingAreaDetails(parkingAreaDetails: boolean): void;
   handleParkingAreaData(parkingAreaData: IParkingArea): void;
   handleParkingAreaDetailData(parkingAreaDetails: IParkingAreaDetails): void;
+  handleDataBaseError(databaseError: boolean): void;
 }
 
 export default function ParkingAreaDescription(props: IParkingAreaDescription) {
@@ -37,6 +38,7 @@ export default function ParkingAreaDescription(props: IParkingAreaDescription) {
     handleParkingAreaDetails,
     handleParkingAreaData,
     handleParkingAreaDetailData,
+    handleDataBaseError,
   } = props;
   const [parkingAreaData, setParkingAreaData] = useState({} as IParkingArea);
   const [parkingAreaDetailsData, setParkingAreaDetailsData] = useState(
@@ -89,6 +91,7 @@ export default function ParkingAreaDescription(props: IParkingAreaDescription) {
   };
 
   const handleParkingAreaDetailsData = (showDetails: boolean) => {
+    handleDataBaseError(databaseError);
     handleParkingAreaData(parkingAreaData);
     handleParkingAreaDetailData(parkingAreaDetailsData);
     handleParkingAreaDetails(showDetails);
@@ -135,7 +138,7 @@ export default function ParkingAreaDescription(props: IParkingAreaDescription) {
             />
           </View>
           <Text style={styles.text}>
-            Die Daten konnten nicht abgerufen werden. Aktion bitte wiederholen!
+            Die Daten konnten nicht abgerufen werden.
           </Text>
         </View>
       ) : (

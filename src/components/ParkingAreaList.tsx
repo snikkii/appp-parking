@@ -21,6 +21,7 @@ interface IParkingAreaList {
   handleParkingAreaDetails(parkingAreaDetails: boolean): void;
   handleParkingAreaData(parkingAreaData: IParkingArea): void;
   handleParkingAreaDetailData(parkingAreaDetails: IParkingAreaDetails): void;
+  handleDataBaseError(databaseError: boolean): void;
 }
 
 export default function ParkingAreaList(props: IParkingAreaList) {
@@ -31,6 +32,7 @@ export default function ParkingAreaList(props: IParkingAreaList) {
     handleParkingAreaDetails,
     handleParkingAreaData,
     handleParkingAreaDetailData,
+    handleDataBaseError,
   } = props;
   const [parkingAreaRows, setParkingAreaRows] = useState(
     {} as SQLite.SQLResultSetRowList
@@ -68,8 +70,10 @@ export default function ParkingAreaList(props: IParkingAreaList) {
       handleParkingAreaDetails(true);
       handleParkingAreaData(parkingAreas);
       handleParkingAreaDetailData(parkingAreaDetails);
+      handleDataBaseError(false);
     } catch (error) {
       console.error(error);
+      handleDataBaseError(true);
       Alert.alert("Warnung!", "Es konnten keine Daten gefunden werden.");
     }
   };
@@ -125,8 +129,7 @@ export default function ParkingAreaList(props: IParkingAreaList) {
         ) : (
           <View style={styles.warnItem}>
             <Text style={styles.warnText}>
-              Die Parkhäuser können aktuell nicht angezeigt werden. App bitte
-              neu starten!
+              Die Parkhäuser können aktuell nicht angezeigt werden.
             </Text>
             <Ionicons.Button
               style={styles.icons}

@@ -22,6 +22,7 @@ export default function App() {
   const [longUser, setLongUser] = useState(0);
   const [openParkingAreaList, setOpenParkingAreaList] = useState(false);
   const [volume, setVolume] = useState(false);
+  const [databaseError, setDatabaseError] = useState(false);
   const [parkingAreaData, setParkingAreaData] = useState({} as IParkingArea);
   const [parkingAreaDetailsData, setParkingAreaDetailsData] = useState(
     {} as IParkingAreaDetails
@@ -70,6 +71,10 @@ export default function App() {
     parkingAreaDetailData: IParkingAreaDetails
   ) => {
     setParkingAreaDetailsData(parkingAreaDetailData);
+  };
+
+  const getDataBaseError = (databaseError: boolean) => {
+    setDatabaseError(databaseError);
   };
 
   const getUserPosition = (latUser?: number, longUser?: number) => {
@@ -132,6 +137,7 @@ export default function App() {
             handleParkingAreaDetails={showParkingAreaDetails}
             handleParkingAreaData={getParkingAreaData}
             handleParkingAreaDetailData={getParkingAreaDetailsData}
+            handleDataBaseError={getDataBaseError}
           />
         ) : (
           <ParkingMap
@@ -152,6 +158,7 @@ export default function App() {
             handleParkingAreaDetails={showParkingAreaDetails}
             handleParkingAreaData={getParkingAreaData}
             handleParkingAreaDetailData={getParkingAreaDetailsData}
+            handleDataBaseError={getDataBaseError}
           />
         ) : undefined}
 
@@ -161,6 +168,7 @@ export default function App() {
             handleShowParkingAreaDetails={showParkingAreaDetails}
             parkingAreaData={parkingAreaData}
             parkingAreaDetailsData={parkingAreaDetailsData}
+            databaseError={databaseError}
           />
         ) : undefined}
       </View>
