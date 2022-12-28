@@ -5,6 +5,8 @@ import {
   View,
   TouchableOpacity,
   Alert,
+  Platform,
+  Linking,
 } from "react-native";
 import { useEffect, useState } from "react";
 import { DbConnectionService } from "../database/DbConnectionService";
@@ -108,6 +110,31 @@ export default function ParkingAreaDescription(props: IParkingAreaDescription) {
 
   const showParkingAreaDescription = (showDescription: boolean) => {
     handleShowParkingAreaDescription(showDescription);
+  };
+
+  const requestSwitchingApps = () => {
+    Alert.alert(
+      outputText.navigationTitle,
+      Platform.OS === outputText.platform
+        ? outputText.navigationBodyIos
+        : outputText.navigationBodyAndroid,
+      [
+        {
+          text: outputText.cancelText,
+          style: "cancel",
+        },
+        { text: outputText.okayText, onPress: navigateToParkingArea },
+      ]
+    );
+  };
+
+  const navigateToParkingArea = () => {
+    const destination = `${parkingAreaData.lat},${parkingAreaData.long}`;
+    const company =
+      Platform.OS === outputText.platform
+        ? outputText.apple
+        : outputText.google;
+    Linking.openURL(`https://maps.${company}.com/maps?daddr=${destination}`);
   };
 
   useEffect(() => {
@@ -271,7 +298,7 @@ export default function ParkingAreaDescription(props: IParkingAreaDescription) {
             </TouchableOpacity>
           </View>
           {showLetsGoButton === true ? (
-            <TouchableOpacity>
+            <TouchableOpacity onPress={requestSwitchingApps}>
               <View style={styles.navigateItem}>
                 <MaterialIcons
                   name="directions"

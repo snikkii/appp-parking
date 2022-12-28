@@ -72,4 +72,12 @@ export const outputText = {
   trendNeutral: "Gleichbleibend",
   currentStatus: "Aktueller Status",
   inGeofenceMessage: "Parkmöglichkeit in der Nähe: ",
+  navigationTitle: "Weiterleitung",
+  navigationBodyIos: "Sie werden nun zu Apple Maps weitergeleitet.",
+  navigationBodyAndroid: "Sie werden nun zu Google Maps weitergeleitet.",
+  okayText: "OK",
+  cancelText: "Abbrechen",
+  apple: "apple",
+  google: "google",
+  platform: "ios",
 };
