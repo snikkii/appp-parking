@@ -17,6 +17,7 @@ import Toast from "react-native-root-toast";
 import { IEventData } from "../models/IEventData";
 import { errorMessages, outputText } from "../strings";
 import { colors } from "../colors";
+import ParkingAreaDescriptionItemContainer from "./ParkingAreaDescriptionItemContainer";
 
 interface IParkingAreaDescription {
   dbConnectionService: DbConnectionService;
@@ -211,90 +212,62 @@ export default function ParkingAreaDescription(props: IParkingAreaDescription) {
             />
           </View>
           <View style={styles.itemContainer}>
-            <View style={styles.item}>
-              {parkingAreaDetailsData.trend === 0 ? (
-                <MaterialIcons
-                  name="trending-neutral"
-                  size={30}
-                  color={colors.trendNeutral}
-                  backgroundColor="transparent"
-                />
-              ) : undefined}
-              {parkingAreaDetailsData.trend === -1 ? (
-                <MaterialIcons
-                  name="trending-down"
-                  size={30}
-                  color={colors.trendDown}
-                  backgroundColor="transparent"
-                />
-              ) : undefined}
-              {parkingAreaDetailsData.trend === 1 ? (
-                <MaterialIcons
-                  name="trending-up"
-                  size={30}
-                  color={colors.warningRed}
-                  backgroundColor="transparent"
-                />
-              ) : undefined}
-              <Text style={styles.text}>
-                {parkingAreaDetailsData.numberOfFreeLots + outputText.freeLots}
-              </Text>
-            </View>
-            <View style={styles.item}>
-              <MaterialIcons
-                name="euro"
-                size={30}
-                color={colors.backgroundGray}
-                backgroundColor="transparent"
+            {parkingAreaDetailsData.trend === 0 ? (
+              <ParkingAreaDescriptionItemContainer
+                containerText={
+                  parkingAreaDetailsData.numberOfFreeLots + outputText.freeLots
+                }
+                materialIconName="trending-neutral"
+                iconColor={colors.trendNeutral}
               />
-              <Text style={styles.text}>
-                {parkingAreaData.pricePerHour + outputText.perHour}
-              </Text>
-            </View>
-            <View style={styles.item}>
-              <Ionicons
-                name="ios-time"
-                size={30}
-                color={colors.backgroundGray}
-                backgroundColor="transparent"
+            ) : undefined}
+            {parkingAreaDetailsData.trend === -1 ? (
+              <ParkingAreaDescriptionItemContainer
+                containerText={
+                  parkingAreaDetailsData.numberOfFreeLots + outputText.freeLots
+                }
+                materialIconName="trending-down"
+                iconColor={colors.trendDown}
               />
-              <Text style={styles.text}>
-                {parkingAreaData.openingHours + outputText.hour}
-              </Text>
-            </View>
+            ) : undefined}
+            {parkingAreaDetailsData.trend === 1 ? (
+              <ParkingAreaDescriptionItemContainer
+                containerText={
+                  parkingAreaDetailsData.numberOfFreeLots + outputText.freeLots
+                }
+                materialIconName="trending-up"
+                iconColor={colors.warningRed}
+              />
+            ) : undefined}
+
+            <ParkingAreaDescriptionItemContainer
+              containerText={parkingAreaData.pricePerHour + outputText.perHour}
+              materialIconName="euro"
+              iconColor={colors.backgroundGray}
+            />
+
+            <ParkingAreaDescriptionItemContainer
+              containerText={parkingAreaData.openingHours + outputText.hour}
+              ioniconsIconName="ios-time"
+              iconColor={colors.backgroundGray}
+            />
+
             {parkingAreaData.doorHeight === "" ? undefined : (
-              <View style={styles.item}>
-                <View style={styles.heightIconsContainer}>
-                  <MaterialIcons
-                    name="height"
-                    size={30}
-                    color={colors.backgroundGray}
-                    backgroundColor="transparent"
-                  />
-                  <MaterialIcons
-                    name="directions-car"
-                    size={30}
-                    color={colors.backgroundGray}
-                    backgroundColor="transparent"
-                  />
-                </View>
-                <Text style={styles.text}>
-                  {parkingAreaData.doorHeight + outputText.meters}
-                </Text>
-              </View>
+              <ParkingAreaDescriptionItemContainer
+                containerText={parkingAreaData.doorHeight + outputText.meters}
+                materialIconName="height"
+                secondMaterialIconName="directions-car"
+                iconColor={colors.backgroundGray}
+              />
             )}
             <TouchableOpacity
               onPress={() => handleParkingAreaDetailsData(true)}
             >
-              <View style={styles.item}>
-                <MaterialIcons
-                  name="more-horiz"
-                  size={30}
-                  color={colors.backgroundGray}
-                  backgroundColor="transparent"
-                />
-                <Text style={styles.text}>{outputText.more}</Text>
-              </View>
+              <ParkingAreaDescriptionItemContainer
+                containerText={outputText.more}
+                materialIconName="more-horiz"
+                iconColor={colors.backgroundGray}
+              />
             </TouchableOpacity>
           </View>
           {showLetsGoButton === true ? (
@@ -334,19 +307,6 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
   },
-  item: {
-    flexDirection: "column",
-    width: Dimensions.get("window").width * 0.16,
-    height: Dimensions.get("window").height * 0.1,
-    borderColor: colors.white,
-    backgroundColor: colors.white,
-    borderWidth: 2,
-    borderRadius: 10,
-    margin: 5,
-    padding: 10,
-    justifyContent: "center",
-    alignItems: "center",
-  },
   navigateItem: {
     flexDirection: "row",
     width: Dimensions.get("window").width * 0.9,
@@ -359,9 +319,6 @@ const styles = StyleSheet.create({
     padding: 2,
     justifyContent: "center",
     alignItems: "center",
-  },
-  heightIconsContainer: {
-    flexDirection: "row",
   },
   text: {
     color: colors.backgroundGray,
