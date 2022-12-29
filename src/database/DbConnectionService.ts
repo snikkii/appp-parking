@@ -36,28 +36,34 @@ export class DbConnectionService {
   };
 
   public createTables = () => {
-    this.parkingAreaDb.transaction((tx) => {
-      // tx.executeSql("drop table parkingdetails");
-      // tx.executeSql("drop table parkingarea");
-      tx.executeSql(sqlQuerys.createTableParkingArea);
-      tx.executeSql(sqlQuerys.selectAllFromParkingArea, [], (_, { rows }) => {
-        if (rows.length == 0) {
-          allParkingAreas.map((parkingArea: IParkingArea) =>
-            tx.executeSql(sqlQuerys.insertAllDataIntoParkingArea, [
-              parkingArea.name,
-              parkingArea.address,
-              parkingArea.openingHours,
-              parkingArea.pricePerHour,
-              parkingArea.doorHeight,
-              parkingArea.favorite,
-              parkingArea.lat,
-              parkingArea.long,
-            ])
-          );
-        }
-      });
-      tx.executeSql(sqlQuerys.createTableParkingAreaDetails);
-    });
+    this.parkingAreaDb.transaction(
+      (tx) => {
+        // tx.executeSql("drop table parkingdetails");
+        // tx.executeSql("drop table parkingarea");
+        tx.executeSql(sqlQuerys.createTableParkingArea);
+        tx.executeSql(sqlQuerys.selectAllFromParkingArea, [], (_, { rows }) => {
+          if (rows.length == 0) {
+            allParkingAreas.map((parkingArea: IParkingArea) =>
+              tx.executeSql(sqlQuerys.insertAllDataIntoParkingArea, [
+                parkingArea.name,
+                parkingArea.address,
+                parkingArea.openingHours,
+                parkingArea.pricePerHour,
+                parkingArea.doorHeight,
+                parkingArea.favorite,
+                parkingArea.lat,
+                parkingArea.long,
+              ])
+            );
+          }
+        });
+        tx.executeSql(sqlQuerys.createTableParkingAreaDetails);
+      },
+      (error) => {
+        console.error(error);
+        Alert.alert(errorMessages.warning, errorMessages.databaseProblem);
+      }
+    );
   };
 
   public getData = () => {
