@@ -22,28 +22,26 @@ import ParkingAreaDescriptionItemContainer from "./ParkingAreaDescriptionItemCon
 interface IParkingAreaDescription {
   dbConnectionService: DbConnectionService;
   id: number;
-  latUser: number;
-  longUser: number;
   geofenceEventData: IEventData[];
   handleShowParkingAreaDescription(parkingAreaDescription: boolean): void;
   handleParkingAreaDetails(parkingAreaDetails: boolean): void;
   handleParkingAreaData(parkingAreaData: IParkingArea): void;
   handleParkingAreaDetailData(parkingAreaDetails: IParkingAreaDetails): void;
   handleDataBaseError(databaseError: boolean): void;
+  handleVolume(volume: boolean): void;
 }
 
 export default function ParkingAreaDescription(props: IParkingAreaDescription) {
   const {
     dbConnectionService,
     id,
-    latUser,
-    longUser,
     geofenceEventData,
     handleShowParkingAreaDescription,
     handleParkingAreaDetails,
     handleParkingAreaData,
     handleParkingAreaDetailData,
     handleDataBaseError,
+    handleVolume,
   } = props;
   const [parkingAreaData, setParkingAreaData] = useState({} as IParkingArea);
   const [parkingAreaDetailsData, setParkingAreaDetailsData] = useState(
@@ -51,7 +49,7 @@ export default function ParkingAreaDescription(props: IParkingAreaDescription) {
   );
   const [databaseError, setDatabaseError] = useState(false);
   const [favorite, setFavorite] = useState(0);
-  const [showLetsGoButton, sethowLetsGoButton] = useState(false);
+  const [showLetsGoButton, setShowLetsGoButton] = useState(false);
 
   const fetchDataFromTable = async () => {
     try {
@@ -106,6 +104,7 @@ export default function ParkingAreaDescription(props: IParkingAreaDescription) {
     handleDataBaseError(databaseError);
     handleParkingAreaData(parkingAreaData);
     handleParkingAreaDetailData(parkingAreaDetailsData);
+    handleVolume(false);
     handleParkingAreaDetails(showDetails);
   };
 
@@ -114,6 +113,7 @@ export default function ParkingAreaDescription(props: IParkingAreaDescription) {
   };
 
   const requestSwitchingApps = () => {
+    handleVolume(false);
     Alert.alert(
       outputText.navigationTitle,
       Platform.OS === outputText.platform
@@ -145,7 +145,7 @@ export default function ParkingAreaDescription(props: IParkingAreaDescription) {
   useEffect(() => {
     geofenceEventData.map((parkingArea: IEventData) => {
       if (parkingArea.parkingAreaName === parkingAreaData.name) {
-        sethowLetsGoButton(parkingArea.enteredParkingArea);
+        setShowLetsGoButton(parkingArea.enteredParkingArea);
       }
     });
   });

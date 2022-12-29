@@ -12,17 +12,11 @@ import { colors } from "../colors";
 interface IParkingMapProps {
   handleParkingAreaId(id: number): void;
   handleParkingAreaDescription(parkingAreaDescription: boolean): void;
-  handleUserPosition(latUser?: number, longUser?: number): void;
   mapStyle: StyleProp<ViewStyle>;
 }
 
 export function ParkingMap(props: IParkingMapProps) {
-  const {
-    handleParkingAreaId,
-    handleParkingAreaDescription,
-    handleUserPosition,
-    mapStyle,
-  } = props;
+  const { handleParkingAreaId, handleParkingAreaDescription, mapStyle } = props;
   const [location, setLocation] = useState<Location.LocationObject | null>(
     null
   );
@@ -34,7 +28,7 @@ export function ParkingMap(props: IParkingMapProps) {
       identifier: parkingArea.name,
       latitude: parkingArea.lat,
       longitude: parkingArea.long,
-      radius: 250,
+      radius: 200,
     });
   });
 
@@ -66,20 +60,8 @@ export function ParkingMap(props: IParkingMapProps) {
     }
   }, []);
 
-  const handleSetValues = (
-    id: number,
-    showDescription: boolean,
-    latUser?: number,
-    longUser?: number
-  ) => {
+  const handleSetValues = (id: number, showDescription: boolean) => {
     handleParkingAreaId(id);
-    if (latUser == undefined) {
-      latUser = 0;
-    }
-    if (longUser == undefined) {
-      longUser = 0;
-    }
-    handleUserPosition(latUser, longUser);
     handleParkingAreaDescription(showDescription);
   };
 
@@ -101,23 +83,6 @@ export function ParkingMap(props: IParkingMapProps) {
             : undefined
         }
       >
-        {/* TODO: "drive" on iphone */}
-        {/* {location ? (
-          <Marker
-            coordinate={{
-              latitude: location.coords.latitude,
-              longitude: location.coords.longitude,
-            }}
-          >
-            <Ionicons
-              name="ios-car-sport"
-              size={30}
-              color="#005b60"
-              backgroundColor="transparent"
-            />
-          </Marker>
-        ) : undefined} */}
-
         {allParkingAreas.map((parkingArea: IParkingArea) => (
           <Marker
             key={parkingArea.id}
@@ -127,27 +92,15 @@ export function ParkingMap(props: IParkingMapProps) {
             }}
             title={parkingArea.name}
             onPress={() => {
-              handleSetValues(
-                parkingArea.id,
-                true,
-                location?.coords.latitude,
-                location?.coords.longitude
-              );
+              handleSetValues(parkingArea.id, true);
             }}
           >
             <MaterialIcons
               name="location-on"
               size={50}
-              // color="#00adad"
               color={colors.markerBlue}
               backgroundColor="transparent"
             />
-            {/* <FontAwesome5
-              name="parking"
-              size={50}
-              color="#00adad"
-              backgroundColor="transparent"
-            /> */}
           </Marker>
         ))}
       </MapView>

@@ -12,6 +12,9 @@ import { useGeofenceEvent } from "./src/hooks/useGeofenceEvent";
 import { IParkingArea } from "./src/models/IParkingArea";
 import { IParkingAreaDetails } from "./src/models/IParkingAreaDetails";
 import { colors } from "./src/colors";
+import { IEventData } from "./src/models/IEventData";
+import * as Speech from "expo-speech";
+import { allParkingAreas } from "./src/AllParkingAreas";
 
 const dbConnectionService = new DbConnectionService();
 
@@ -28,8 +31,35 @@ export default function App() {
   const [parkingAreaDetailsData, setParkingAreaDetailsData] = useState(
     {} as IParkingAreaDetails
   );
-  const MINUTES_MS = 60000; // 1 minute TODO: change to ten minutes when app is finished
+  // TODO: change to ten minutes when app is finished
+  const MINUTES_MS = 60000; // 1 minute
   const geofenceEventData = useGeofenceEvent();
+  const speak = (parkingAreaName: string) => {
+    Speech.speak("Parkmöglichkeit in der Nähe: " + parkingAreaName, {
+      language: "de-DE",
+    });
+  };
+  const [areParkingAreasInGeofence, setAreParkingAreasInGeofence] = useState(
+    [] as IEventData[]
+  );
+  const getCurrentGeofenceData = (name: string, entered: boolean) => {
+    let newGeofenceEventData = [...areParkingAreasInGeofence];
+    newGeofenceEventData.map((parkingArea) => {
+      if (name === parkingArea.parkingAreaName) {
+        parkingArea.enteredParkingArea = entered;
+      }
+    });
+    return newGeofenceEventData;
+  };
+
+  if (areParkingAreasInGeofence.length === 0) {
+    allParkingAreas.map((parkingArea: IParkingArea) => {
+      areParkingAreasInGeofence.push({
+        parkingAreaName: parkingArea.name,
+        enteredParkingArea: false,
+      });
+    });
+  }
 
   useEffect(() => {
     dbConnectionService.createTables();
@@ -46,8 +76,31 @@ export default function App() {
   }, []);
 
   useEffect(() => {
-    // TODO: tts
+    if (geofenceEventData.enteredParkingArea === true) {
+      setAreParkingAreasInGeofence(
+        getCurrentGeofenceData(
+          geofenceEventData.parkingAreaName,
+          geofenceEventData.enteredParkingArea
+        )
+      );
+      if (volume === true) {
+        speak(geofenceEventData.parkingAreaName);
+      }
+    } else if (geofenceEventData.enteredParkingArea === false) {
+      setAreParkingAreasInGeofence(
+        getCurrentGeofenceData(
+          geofenceEventData.parkingAreaName,
+          geofenceEventData.enteredParkingArea
+        )
+      );
+    }
   }, [geofenceEventData]);
+
+  useEffect(() => {
+    if (volume === false) {
+      Speech.stop();
+    }
+  }, [volume]);
 
   const getParkingAreaId = (id: number) => {
     setParkingAreaId(id);
@@ -78,18 +131,10 @@ export default function App() {
     setDatabaseError(databaseError);
   };
 
-  const getUserPosition = (latUser?: number, longUser?: number) => {
-    if (latUser == undefined) {
-      latUser = 0;
-    }
-    if (longUser == undefined) {
-      longUser = 0;
-    }
-    setLatUser(latUser);
-    setLongUser(longUser);
-  };
-
   const showParkingAreaList = (showList: boolean) => {
+    if (showList === true) {
+      setVolume(false);
+    }
     setOpenParkingAreaList(showList);
   };
 
@@ -125,7 +170,7 @@ export default function App() {
                 size={35}
                 color={colors.white}
                 backgroundColor="transparent"
-                onPress={() => setOpenParkingAreaList(true)}
+                onPress={() => showParkingAreaList(true)}
               />
             </View>
           </View>
@@ -144,7 +189,6 @@ export default function App() {
           <ParkingMap
             handleParkingAreaId={getParkingAreaId}
             handleParkingAreaDescription={showParkingAreaDescription}
-            handleUserPosition={getUserPosition}
             mapStyle={showDescription ? styles.mapWithDescription : styles.map}
           />
         )}
@@ -152,14 +196,13 @@ export default function App() {
           <ParkingAreaDescription
             dbConnectionService={dbConnectionService}
             id={parkingAreaId}
-            latUser={latUser}
-            longUser={longUser}
-            geofenceEventData={geofenceEventData}
+            geofenceEventData={areParkingAreasInGeofence}
             handleShowParkingAreaDescription={showParkingAreaDescription}
             handleParkingAreaDetails={showParkingAreaDetails}
             handleParkingAreaData={getParkingAreaData}
             handleParkingAreaDetailData={getParkingAreaDetailsData}
             handleDataBaseError={getDataBaseError}
+            handleVolume={setVolume}
           />
         ) : undefined}
 

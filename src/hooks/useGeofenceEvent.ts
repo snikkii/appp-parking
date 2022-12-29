@@ -2,30 +2,27 @@ import * as TaskManager from "expo-task-manager";
 import * as Location from "expo-location";
 import Toast from "react-native-root-toast";
 import { useEffect, useState } from "react";
-import { allParkingAreas } from "../AllParkingAreas";
-import { IParkingArea } from "../models/IParkingArea";
 import { IEventData } from "../models/IEventData";
 import { configStrings, errorMessages, outputText } from "../strings";
 
 let geofenceHandles: TaskManager.TaskManagerTaskExecutor[] = [];
 
-TaskManager.defineTask(configStrings.geofenceTask, (data: any) => {
+TaskManager.defineTask(configStrings.geofenceTask, (data) => {
   for (const handle of geofenceHandles) {
     handle(data);
   }
 });
 
 export function useGeofenceEvent() {
-  const [eventData, setEventData] = useState([] as IEventData[]);
+  const [eventData, setEventData] = useState({
+    parkingAreaName: "",
+    enteredParkingArea: false,
+  } as IEventData);
 
-  if (eventData.length === 0) {
-    allParkingAreas.map((parkingArea: IParkingArea) => {
-      eventData.push({
-        parkingAreaName: parkingArea.name,
-        enteredParkingArea: false,
-      });
-    });
-  }
+  let currentData = {
+    parkingAreaName: "",
+    enteredParkingArea: false,
+  } as IEventData;
 
   useEffect(() => {
     const handleIsInGeofence = ({ data, error }: any) => {
@@ -36,25 +33,34 @@ export function useGeofenceEvent() {
           position: Toast.positions.CENTER,
         });
       }
-      let newEventData = [...eventData];
+
+      if (currentData.enteredParkingArea === true) {
+        if (
+          data.region.identifier === currentData.parkingAreaName &&
+          data.eventType === Location.GeofencingEventType.Enter
+        ) {
+          return;
+        }
+      }
+
       if (data.eventType === Location.GeofencingEventType.Enter) {
-        newEventData.map((parkingArea: IEventData) => {
-          if (parkingArea.parkingAreaName === data.region.identifier) {
-            parkingArea.enteredParkingArea = true;
-          }
+        currentData.enteredParkingArea = true;
+        currentData.parkingAreaName = data.region.identifier;
+        setEventData({
+          parkingAreaName: data.region.identifier,
+          enteredParkingArea: true,
         });
-        setEventData(newEventData);
         Toast.show(outputText.inGeofenceMessage + data.region.identifier, {
           duration: Toast.durations.LONG,
           position: Toast.positions.CENTER,
         });
       } else if (data.eventType === Location.GeofencingEventType.Exit) {
-        newEventData.map((parkingArea: IEventData) => {
-          if (parkingArea.parkingAreaName === data.region.identifier) {
-            parkingArea.enteredParkingArea = false;
-          }
+        currentData.enteredParkingArea = false;
+        currentData.parkingAreaName = data.region.identifier;
+        setEventData({
+          parkingAreaName: data.region.identifier,
+          enteredParkingArea: false,
         });
-        setEventData(newEventData);
       }
     };
 

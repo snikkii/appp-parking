@@ -75,8 +75,8 @@ export const allParkingAreas: IParkingArea[] = [
     pricePerHour: "0,50",
     doorHeight: "",
     favorite: 0,
-    lat: 49.44088221921505,
-    long: 11.860889270505018,
+    lat: 49.44133,
+    long: 11.860518,
   },
   {
     id: 8,

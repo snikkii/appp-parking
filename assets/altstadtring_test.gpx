@@ -158,6 +158,7 @@
           <speed>5.024937629699707</speed>
         </extensions>
       </trkpt>
+      <!-- hier: kurz vor Bahnhof -->
       <trkpt lat="49.4463192" lon="11.8632768">
         <ele>419.1</ele>
         <time>2022-11-20T14:17:05Z</time>
