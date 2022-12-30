@@ -80,6 +80,9 @@
 
 \lstset{numbers=left, numberstyle=\tiny, numbersep=5pt}
 \lstset{language=Java}
+\usepackage{xurl}
+\usepackage{subfig}
+\graphicspath{ {./pictures/} }
 
 
 
@@ -108,12 +111,15 @@
   \newpage
   
   \pagenumbering{arabic}
-  \include{kapitel1}
-  
+  \include{1_einleitung}
+  \include{2_architektur}
+  \include{3_implementierung}
+  \include{4_starten_der_app}
+ 
   \phantomsection
   \addcontentsline{toc}{chapter}{Literaturverzeichnis}
   \begin{thebibliography}{10}
-    \bibitem{quelle1} Schreiberling, Tim: ,,Bestseller-Buch'', 1.~Auflage, S.~13ff, Renner-Verlag, Musterstadt, 2011.
+%    \bibitem{quelle1} Schreiberling, Tim: ,,Bestseller-Buch'', 1.~Auflage, S.~13ff, Renner-Verlag, Musterstadt, 2011.
   \end{thebibliography}
   \newpage
   
@@ -121,4 +127,5 @@
   \addcontentsline{toc}{chapter}{Abbildungsverzeichnis}
   \listoffigures
   \newpage
+  \include{anhang}
 \end{document}    
