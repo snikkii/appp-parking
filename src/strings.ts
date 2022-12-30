@@ -1,6 +1,6 @@
 export const sqlQuerys = {
   createTableParkingArea:
-    "create table if not exists parkingarea (id integer primary key not null, name string, address string, openingHours string, pricePerHour string, doorHeight string, favorite number, lat number, long number);",
+    "create table if not exists parkingarea (id integer primary key not null, name string, address string, openingHours number, pricePerHour string, doorHeight string, favorite number, lat number, long number);",
   insertAllDataIntoParkingArea:
     "insert into parkingarea (name, address, openingHours, pricePerHour, doorHeight, favorite, lat, long) values (?, ?, ?, ?, ?, ?, ?, ?)",
   selectAllFromParkingArea: "select * from parkingarea",

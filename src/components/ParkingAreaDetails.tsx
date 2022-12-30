@@ -132,7 +132,8 @@ export default function ParkingAreaList(props: IParkingAreaDetailsList) {
                 errorStyle={false}
                 headingText={outputText.open}
                 bodyText={[
-                  parkingAreaData.openingHours + outputText.openedText,
+                  parkingAreaData.openingHours.toString() +
+                    outputText.openedText,
                 ]}
               />
             )}

@@ -247,7 +247,9 @@ export default function ParkingAreaDescription(props: IParkingAreaDescription) {
             />
 
             <ParkingAreaDescriptionItemContainer
-              containerText={parkingAreaData.openingHours + outputText.hour}
+              containerText={
+                parkingAreaData.openingHours.toString() + outputText.hour
+              }
               ioniconsIconName="ios-time"
               iconColor={colors.backgroundGray}
             />
