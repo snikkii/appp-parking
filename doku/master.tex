@@ -59,6 +59,15 @@
 \usepackage{microtype,relsize}			
 \newcommand*{\Sperren}[1]{\textls*[100]{#1}}
 
+\usepackage{xurl}
+\usepackage[table]{xcolor}
+\usepackage{multirow}
+\usepackage{nicematrix}
+\usepackage{hhline}
+\usepackage{ifthen}
+\usepackage{subfig}
+\usepackage{tabularray}
+
 \usepackage{listings}			% Darstellung von Quellcode
 \definecolor{gray}{rgb}{0.5, 0.5, 0.5}
 \definecolor{blue}{rgb}{0.0, 0.0, 1.0}
@@ -141,13 +150,33 @@
   \phantomsection
   \addcontentsline{toc}{chapter}{Literaturverzeichnis}
   \begin{thebibliography}{10}
+  	\bibitem{whyReactNative} Meta Platforms, Inc. (2023, Januar 05). React Native. Learn once, write anywhere. [online]. Verfügbar: \url{https://reactnative.dev/}.
+  	
+  	\bibitem{whyTypeScript} Microsoft. (2023, Januar 05). TypeScript is JavaScript with syntax for types. [online]. Verfügbar: \url{https://www.typescriptlang.org/}.
+  	
+  	\bibitem{whyExpo} Expo. (2023, Januar 05). What is Expo? An overview of Expo tools, features and services. [online]. Verfügbar: \url{https://docs.expo.dev/introduction/expo/}.
+  	
+  	\bibitem{colors} ColorSpace. (2023, Januar 05). Never waste Hours on finding the perfect Color Palette again! [online]. Verfügbar: \url{https://mycolor.space/?hex=%232E2D2D&sub=1}.
+  	
+  	\bibitem{icons} J. Arvidsson. (2023, Januar 05). react-native-vector-icons directory. [online]. Verfügbar: \url{https://oblador.github.io/react-native-vector-icons/}.
+  	
 	\bibitem{useIntervalCode} F. Hameed. (2023, Januar 05). How to call an API every minute for a Dashboard in REACT. For those looking for functional components. [online]. Verfügbar: \url{https://stackoverflow.com/questions/48601813/how-to-call-an-api-every-minute-for-a-dashboard-in-react}.
 	
 	\bibitem{toastLibrary} Horcrux. (2023, Januar 05). react-native-root-toast. [online]. Verfügbar: \url{https://github.com/magicismight/react-native-root-toast}.
 	
+	\bibitem{taskmanager} Expo. (2023, Januar 05). TaskManager. [online]. Verfügbar: \url{https://docs.expo.dev/versions/latest/sdk/task-manager/}.
+	
 	\bibitem{expoLocation} Expo. (2023, Januar 05). Location. [online]. Verfügbar: \url{https://docs.expo.dev/versions/v47.0.0/sdk/location/}.
 	
 	\bibitem{reactnativemaps} Airbnb. (2023, Januar 05). react-native-maps. [online]. Verfügbar: \url{https://github.com/react-native-maps/react-native-maps}.
+	
+	\bibitem{sqlite} Expo. (2023, Januar 05) examples. [online]. Verfügbar: \url{https://github.com/expo/examples/blob/master/with-sqlite/App.js#L14}.
+	
+	\bibitem{xmlParser} Autor unbekannt. (2023 Januar, 05). fast-xml-parser. [online]. Verfügbar: \url{https://www.npmjs.com/package/fast-xml-parser}.
+	
+	\bibitem{htmlEntities} Autor unbekannt. (2023 Januar, 05). html-entities. [online]. Verfügbar: \url{https://www.npmjs.com/package/html-entities}.
+	
+	\bibitem{tunneling} Expo. (2023, Januar 05). Expo CLI. [online]. Verfügbar: \url{https://docs.expo.dev/workflow/expo-cli/}
   \end{thebibliography}
   \newpage
   
@@ -155,5 +184,7 @@
   \addcontentsline{toc}{chapter}{Abbildungsverzeichnis}
   \listoffigures
   \newpage
-  \include{anhang}
+  \addcontentsline{toc}{chapter}{Listingverzeichnis}
+  \renewcommand{\lstlistlistingname}{Listingverzeichnis}
+  \lstlistoflistings
 \end{document}    

@@ -1,5 +1,4 @@
 import { IParkingArea } from "./models/IParkingArea";
-// TODO openinghours als number
 
 export const allParkingAreas: IParkingArea[] = [
   {
