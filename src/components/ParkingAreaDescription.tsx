@@ -245,14 +245,15 @@ export default function ParkingAreaDescription(props: IParkingAreaDescription) {
               materialIconName="euro"
               iconColor={colors.backgroundGray}
             />
-
-            <ParkingAreaDescriptionItemContainer
-              containerText={
-                parkingAreaData.openingHours.toString() + outputText.hour
-              }
-              ioniconsIconName="ios-time"
-              iconColor={colors.backgroundGray}
-            />
+            {parkingAreaData.openingHours === undefined ? undefined : (
+              <ParkingAreaDescriptionItemContainer
+                containerText={
+                  parkingAreaData.openingHours.toString() + outputText.hour
+                }
+                ioniconsIconName="ios-time"
+                iconColor={colors.backgroundGray}
+              />
+            )}
 
             {parkingAreaData.doorHeight === "" ? undefined : (
               <ParkingAreaDescriptionItemContainer

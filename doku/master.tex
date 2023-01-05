@@ -59,6 +59,28 @@
 \usepackage{microtype,relsize}			
 \newcommand*{\Sperren}[1]{\textls*[100]{#1}}
 
+\usepackage{listings}			% Darstellung von Quellcode
+\definecolor{gray}{rgb}{0.5, 0.5, 0.5}
+\definecolor{blue}{rgb}{0.0, 0.0, 1.0}
+\definecolor{darkgreen}{rgb}{0.0, 0.2, 0.13}
+\definecolor{mauve}{rgb}{0.88, 0.69, 1.0}
+\lstset{frame=tb,
+	language=Java, 
+	aboveskip=3mm,
+	belowskip=3mm,
+	showstringspaces=false,
+	columns=flexible,
+	basicstyle={\small\ttfamily},
+	numbers=left,
+	%	numberstyle=\tiny\color{gray},
+	%	keywordstyle=\color{blue},
+	%	commentstyle=\color{dkgreen},
+	%	stringstyle=\color{mauve},
+	breaklines=true,
+	breakatwhitespace=true,
+	tabsize=3,
+	mathescape=false}
+
 
 \newcommand*{\IhrVorname}{Annika}
 \newcommand*{\IhrNachname}{Stadelmann}
@@ -119,7 +141,13 @@
   \phantomsection
   \addcontentsline{toc}{chapter}{Literaturverzeichnis}
   \begin{thebibliography}{10}
-%    \bibitem{quelle1} Schreiberling, Tim: ,,Bestseller-Buch'', 1.~Auflage, S.~13ff, Renner-Verlag, Musterstadt, 2011.
+	\bibitem{useIntervalCode} F. Hameed. (2023, Januar 05). How to call an API every minute for a Dashboard in REACT. For those looking for functional components. [online]. Verfügbar: \url{https://stackoverflow.com/questions/48601813/how-to-call-an-api-every-minute-for-a-dashboard-in-react}.
+	
+	\bibitem{toastLibrary} Horcrux. (2023, Januar 05). react-native-root-toast. [online]. Verfügbar: \url{https://github.com/magicismight/react-native-root-toast}.
+	
+	\bibitem{expoLocation} Expo. (2023, Januar 05). Location. [online]. Verfügbar: \url{https://docs.expo.dev/versions/v47.0.0/sdk/location/}.
+	
+	\bibitem{reactnativemaps} Airbnb. (2023, Januar 05). react-native-maps. [online]. Verfügbar: \url{https://github.com/react-native-maps/react-native-maps}.
   \end{thebibliography}
   \newpage
   

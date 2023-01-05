@@ -2,7 +2,7 @@ import { StyleSheet, Dimensions, Text, View } from "react-native";
 import { MaterialIcons, Ionicons } from "@expo/vector-icons";
 import { colors } from "../colors";
 
-interface IParkingAreaDescription {
+interface IParkingAreaDescriptionItemContainer {
   containerText: string;
   materialIconName?: keyof typeof MaterialIcons.glyphMap;
   secondMaterialIconName?: keyof typeof MaterialIcons.glyphMap;
@@ -10,7 +10,9 @@ interface IParkingAreaDescription {
   iconColor: string;
 }
 
-export default function ParkingAreaDescription(props: IParkingAreaDescription) {
+export default function ParkingAreaDescriptionItemContainer(
+  props: IParkingAreaDescriptionItemContainer
+) {
   const {
     containerText,
     materialIconName,

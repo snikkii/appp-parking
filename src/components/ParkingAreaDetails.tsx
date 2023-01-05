@@ -67,7 +67,7 @@ export default function ParkingAreaList(props: IParkingAreaDetailsList) {
   };
 
   return (
-    <View>
+    <View style={styles.outerContainer}>
       {databaseError ? (
         <View style={styles.container}>
           <View style={styles.outerHeadingContainer}>
@@ -192,6 +192,11 @@ export default function ParkingAreaList(props: IParkingAreaDetailsList) {
   );
 }
 const styles = StyleSheet.create({
+  outerContainer: {
+    width: Dimensions.get("window").width,
+    height: Dimensions.get("window").height,
+    backgroundColor: colors.backgroundGray,
+  },
   container: {
     flexDirection: "column",
     width: Dimensions.get("window").width,
