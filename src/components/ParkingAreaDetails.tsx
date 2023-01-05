@@ -62,6 +62,7 @@ export default function ParkingAreaList(props: IParkingAreaDetailsList) {
         });
       }
     } catch (error) {
+      console.error(error);
       Alert.alert(errorMessages.warning, errorMessages.databaseProblem);
     }
   };
