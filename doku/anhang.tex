@@ -1,0 +1,44 @@
+\appendix
+\chapter{Code-Ausschnitt}
+\label{appendix:geofencing}
+
+\begin{lstlisting}[caption={Diese Funktion wird beim Betreten oder Verlassen eines Geofences ausgeführt. Im Fehlerfall bekommt der Nutzer per Toast mit, dass etwas schief gelaufen ist. Von Zeile 10 bis 17 wird sichergestellt, dass dasselbe Event nicht fälschlicherweise mehrmals hintereinander auftritt. Anschließend werden die Werte, ob das Geofence verlassen oder betreten wird, gesetzt. Beim Eintritt in das Geofence wird der Nutzer mittels Toast informiert. (Quelle: Eigene Implementierung)},captionpos=b, language=Java, label=lst:handleIsInGeofence]
+	const handleIsInGeofence = ({ data, error }: any) => {
+		if (error) {
+			console.error(error);
+			Toast.show(errorMessages.noCurrentPosition, {
+				duration: Toast.durations.LONG,
+				position: Toast.positions.CENTER,
+			});
+		}
+		
+		if (currentData.enteredParkingArea === true) {
+			if (
+			data.region.identifier === currentData.parkingAreaName &&
+			data.eventType === Location.GeofencingEventType.Enter
+			) {
+				return;
+			}
+		}
+		
+		if (data.eventType === Location.GeofencingEventType.Enter) {
+			currentData.enteredParkingArea = true;
+			currentData.parkingAreaName = data.region.identifier;
+			setEventData({
+				parkingAreaName: data.region.identifier,
+				enteredParkingArea: true,
+			});
+			Toast.show(outputText.inGeofenceMessage + data.region.identifier, {
+				duration: Toast.durations.LONG,
+				position: Toast.positions.CENTER,
+			});
+		} else if (data.eventType === Location.GeofencingEventType.Exit) {
+			currentData.enteredParkingArea = false;
+			currentData.parkingAreaName = data.region.identifier;
+			setEventData({
+				parkingAreaName: data.region.identifier,
+				enteredParkingArea: false,
+			});
+		}
+	};
+\end{lstlisting}
