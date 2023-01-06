@@ -197,6 +197,7 @@ const styles = StyleSheet.create({
     width: Dimensions.get("window").width,
     height: Dimensions.get("window").height,
     backgroundColor: colors.backgroundGray,
+    position: "absolute",
   },
   container: {
     flexDirection: "column",
