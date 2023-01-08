@@ -31,8 +31,7 @@ export default function App() {
   const [parkingAreaDetailsData, setParkingAreaDetailsData] = useState(
     {} as IParkingAreaDetails
   );
-  // TODO: change to ten minutes when app is finished
-  const MINUTES_MS = 60000; // 1 minute
+  const MINUTES_MS = 600000; // 10 minutes
   const geofenceEventData = useGeofenceEvent();
   const speak = (parkingAreaName: string) => {
     Speech.speak("Parkmöglichkeit in der Nähe: " + parkingAreaName, {

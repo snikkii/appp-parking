@@ -45,8 +45,8 @@ export const errorMessages = {
 };
 
 export const outputText = {
-  successAddedToFavorites: "Parkhaus erfolgreich zu Favoriten hinzugefügt!",
-  failAddedToFavorites: "Parkhaus erfolgreich von Favoriten entfernt!",
+  successAddedToFavorites: " erfolgreich zu Favoriten hinzugefügt!",
+  failAddedToFavorites: " erfolgreich von Favoriten entfernt!",
   freeLots: " frei",
   perHour: "/h",
   hour: "h",

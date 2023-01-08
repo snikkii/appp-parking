@@ -31,6 +31,7 @@ export default function ParkingAreaList(props: IParkingAreaDetailsList) {
   const showParkingAreaDetails = (showDetails: boolean) => {
     handleShowParkingAreaDetails(showDetails);
   };
+  const [hours, setHours] = useState("");
 
   useEffect(() => {
     setFavorite(parkingAreaData.favorite);
@@ -40,6 +41,11 @@ export default function ParkingAreaList(props: IParkingAreaDetailsList) {
       setTrend(outputText.trendNeutral);
     } else if (parkingAreaDetailsData.trend === 1) {
       setTrend(outputText.trendUp);
+    }
+    if (parkingAreaData.openingHours === undefined) {
+      setHours("");
+    } else {
+      setHours(parkingAreaData.openingHours.toString() + outputText.openedText);
     }
   }, [parkingAreaData]);
 
@@ -51,12 +57,12 @@ export default function ParkingAreaList(props: IParkingAreaDetailsList) {
       );
       setFavorite(favorite);
       if (favorite == 1) {
-        Toast.show(outputText.successAddedToFavorites, {
+        Toast.show(parkingAreaData.name + outputText.successAddedToFavorites, {
           duration: Toast.durations.SHORT,
           position: Toast.positions.BOTTOM,
         });
       } else if (favorite == 0) {
-        Toast.show(outputText.failAddedToFavorites, {
+        Toast.show(parkingAreaData.name + outputText.failAddedToFavorites, {
           duration: Toast.durations.SHORT,
           position: Toast.positions.BOTTOM,
         });
@@ -132,10 +138,7 @@ export default function ParkingAreaList(props: IParkingAreaDetailsList) {
               <ParkingAreaDetailsItem
                 errorStyle={false}
                 headingText={outputText.open}
-                bodyText={[
-                  parkingAreaData.openingHours.toString() +
-                    outputText.openedText,
-                ]}
+                bodyText={[hours]}
               />
             )}
 

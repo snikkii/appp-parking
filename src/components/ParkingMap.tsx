@@ -43,14 +43,6 @@ export function ParkingMap(props: IParkingMapProps) {
       setLocation(location);
     })();
 
-    (async () => {
-      let { status } = await Location.requestBackgroundPermissionsAsync();
-      if (status !== "granted") {
-        Alert.alert(errorMessages.attention, errorMessages.deniedPermission);
-        return;
-      }
-    })();
-
     if (TaskManager.isTaskDefined(configStrings.geofenceTask)) {
       Location.startGeofencingAsync(configStrings.geofenceTask, regions);
     } else {
@@ -58,6 +50,16 @@ export function ParkingMap(props: IParkingMapProps) {
         Location.startGeofencingAsync(configStrings.geofenceTask, regions);
       }, 5000);
     }
+  }, []);
+
+  useEffect(() => {
+    (async () => {
+      let { status } = await Location.requestBackgroundPermissionsAsync();
+      if (status !== "granted") {
+        Alert.alert(errorMessages.attention, errorMessages.deniedPermission);
+        return;
+      }
+    })();
   }, []);
 
   const handleSetValues = (id: number, showDescription: boolean) => {
@@ -75,12 +77,15 @@ export function ParkingMap(props: IParkingMapProps) {
             ? {
                 longitude: location.coords.longitude, // this is where i am
                 latitude: location.coords.latitude,
-                // longitude: 11.853035893058891, // this is somewhere in amberg
-                // latitude: 49.447723353888115,
                 latitudeDelta: 0.01,
                 longitudeDelta: 0.01,
               }
-            : undefined
+            : {
+                longitude: 11.853035893058891, // this is somewhere in amberg
+                latitude: 49.447723353888115,
+                latitudeDelta: 0.01,
+                longitudeDelta: 0.01,
+              }
         }
       >
         {allParkingAreas.map((parkingArea: IParkingArea) => (

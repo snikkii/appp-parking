@@ -85,12 +85,12 @@ export default function ParkingAreaDescription(props: IParkingAreaDescription) {
       );
       setFavorite(favorite);
       if (favorite == 1) {
-        Toast.show(outputText.successAddedToFavorites, {
+        Toast.show(parkingAreaData.name + outputText.successAddedToFavorites, {
           duration: Toast.durations.SHORT,
           position: Toast.positions.BOTTOM,
         });
       } else if (favorite == 0) {
-        Toast.show(outputText.failAddedToFavorites, {
+        Toast.show(parkingAreaData.name + outputText.failAddedToFavorites, {
           duration: Toast.durations.SHORT,
           position: Toast.positions.BOTTOM,
         });
