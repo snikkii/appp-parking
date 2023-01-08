@@ -31,17 +31,39 @@ export function ParkingMap(props: IParkingMapProps) {
       radius: 200,
     });
   });
+  const locationPermissions = () => {
+    Location.requestForegroundPermissionsAsync()
+      .then(() => {
+        Location.requestBackgroundPermissionsAsync()
+          .then(() => {
+            Location.getCurrentPositionAsync({})
+              .then((location) => {
+                setLocation(location);
+              })
+              .catch(() => {
+                console.log("current");
+                Alert.alert(
+                  errorMessages.attention,
+                  errorMessages.deniedPermission
+                );
+              });
+          })
+          .catch(() => {
+            console.log("background");
+            Alert.alert(
+              errorMessages.attention,
+              errorMessages.deniedPermission
+            );
+          });
+      })
+      .catch(() => {
+        console.log("foreground");
+        Alert.alert(errorMessages.attention, errorMessages.deniedPermission);
+      });
+  };
 
   useEffect(() => {
-    (async () => {
-      let { status } = await Location.requestForegroundPermissionsAsync();
-      if (status !== "granted") {
-        Alert.alert(errorMessages.attention, errorMessages.deniedPermission);
-        return;
-      }
-      let location = await Location.getCurrentPositionAsync({});
-      setLocation(location);
-    })();
+    locationPermissions();
 
     if (TaskManager.isTaskDefined(configStrings.geofenceTask)) {
       Location.startGeofencingAsync(configStrings.geofenceTask, regions);
@@ -50,16 +72,6 @@ export function ParkingMap(props: IParkingMapProps) {
         Location.startGeofencingAsync(configStrings.geofenceTask, regions);
       }, 5000);
     }
-  }, []);
-
-  useEffect(() => {
-    (async () => {
-      let { status } = await Location.requestBackgroundPermissionsAsync();
-      if (status !== "granted") {
-        Alert.alert(errorMessages.attention, errorMessages.deniedPermission);
-        return;
-      }
-    })();
   }, []);
 
   const handleSetValues = (id: number, showDescription: boolean) => {
