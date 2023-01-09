@@ -41,7 +41,6 @@ export function ParkingMap(props: IParkingMapProps) {
                 setLocation(location);
               })
               .catch(() => {
-                console.log("current");
                 Alert.alert(
                   errorMessages.attention,
                   errorMessages.deniedPermission
@@ -49,7 +48,6 @@ export function ParkingMap(props: IParkingMapProps) {
               });
           })
           .catch(() => {
-            console.log("background");
             Alert.alert(
               errorMessages.attention,
               errorMessages.deniedPermission
@@ -57,7 +55,6 @@ export function ParkingMap(props: IParkingMapProps) {
           });
       })
       .catch(() => {
-        console.log("foreground");
         Alert.alert(errorMessages.attention, errorMessages.deniedPermission);
       });
   };

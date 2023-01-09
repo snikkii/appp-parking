@@ -17,8 +17,8 @@
     "assetBundlePatterns": ["**/*"],
     "ios": {
       "infoPlist": {
-        "NSLocationWhenInUseUsageDescription": "This app uses your location.",
-        "NSLocationAlwaysUsageDescription": "This app uses your location.",
+        "NSLocationWhenInUseUsageDescription": "Damit diese App voll funktionsfähig ist, wird der Zugriff auf Ihren Standort benötigt.",
+        "NSLocationAlwaysUsageDescription": "Damit diese App voll funktionsfähig ist, wird der Zugriff auf Ihren Standort benötigt.",
         "UIBackgroundModes": ["location", "fetch"]
       },
       "supportsTablet": true
