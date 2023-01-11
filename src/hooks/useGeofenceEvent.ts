@@ -3,7 +3,7 @@ import * as Location from "expo-location";
 import Toast from "react-native-root-toast";
 import { useEffect, useState } from "react";
 import { IEventData } from "../models/IEventData";
-import { configStrings, errorMessages, outputText } from "../strings";
+import { configStrings, errorMessages } from "../strings";
 
 let geofenceHandles: TaskManager.TaskManagerTaskExecutor[] = [];
 
@@ -49,10 +49,6 @@ export function useGeofenceEvent() {
         setEventData({
           parkingAreaName: data.region.identifier,
           enteredParkingArea: true,
-        });
-        Toast.show(outputText.inGeofenceMessage + data.region.identifier, {
-          duration: Toast.durations.LONG,
-          position: Toast.positions.CENTER,
         });
       } else if (data.eventType === Location.GeofencingEventType.Exit) {
         currentData.enteredParkingArea = false;

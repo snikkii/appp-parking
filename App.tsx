@@ -15,7 +15,8 @@ import { colors } from "./src/colors";
 import { IEventData } from "./src/models/IEventData";
 import * as Speech from "expo-speech";
 import { allParkingAreas } from "./src/AllParkingAreas";
-import { errorMessages } from "./src/strings";
+import { errorMessages, outputText } from "./src/strings";
+import Toast from "react-native-root-toast";
 
 const dbConnectionService = new DbConnectionService();
 
@@ -35,29 +36,6 @@ export default function App() {
   const [areParkingAreasInGeofence, setAreParkingAreasInGeofence] = useState(
     [] as IEventData[]
   );
-  const [freeLots, setFreeLots] = useState(0);
-
-  const speak = (parkingAreaName: string, freeLots: number) => {
-    let text =
-      "Parkmöglichkeit " +
-      parkingAreaName +
-      " in der Nähe. Es sind noch " +
-      freeLots.toString() +
-      " Parkplätze frei.";
-    Speech.speak(text, {
-      language: "de-DE",
-    });
-    console.log(text);
-  };
-  const getCurrentGeofenceData = (name: string, entered: boolean) => {
-    let newGeofenceEventData = [...areParkingAreasInGeofence];
-    newGeofenceEventData.map((parkingArea) => {
-      if (name === parkingArea.parkingAreaName) {
-        parkingArea.enteredParkingArea = entered;
-      }
-    });
-    return newGeofenceEventData;
-  };
 
   if (areParkingAreasInGeofence.length === 0) {
     allParkingAreas.map((parkingArea: IParkingArea) => {
@@ -68,6 +46,26 @@ export default function App() {
     });
   }
 
+  const speak = (text: string) => {
+    Speech.speak(text, {
+      language: "de-DE",
+      onError: (error) => {
+        console.error(error);
+        Alert.alert(errorMessages.warning, errorMessages.ttsProblem);
+      },
+    });
+  };
+
+  const getCurrentGeofenceData = (name: string, entered: boolean) => {
+    let newGeofenceEventData = [...areParkingAreasInGeofence];
+    newGeofenceEventData.map((parkingArea) => {
+      if (name === parkingArea.parkingAreaName) {
+        parkingArea.enteredParkingArea = entered;
+      }
+    });
+    return newGeofenceEventData;
+  };
+
   const getFreeParkingLots = async (
     parkingAreaName: string,
     parkingAreaId: number
@@ -77,12 +75,58 @@ export default function App() {
         (await dbConnectionService.getDataFromParkingAreaDetailsTable(
           parkingAreaId
         )) as IParkingAreaDetails;
-      setFreeLots(parkingAreaDetails.numberOfFreeLots);
-      speak(parkingAreaName, parkingAreaDetails.numberOfFreeLots);
+      if (parkingAreaDetails.numberOfFreeLots !== 0) {
+        let text =
+          parkingAreaName +
+          outputText.inGeofenceMessagePart1 +
+          parkingAreaDetails.numberOfFreeLots.toString() +
+          outputText.inGeofenceMessagePart2;
+        speak(text);
+        Toast.show(text, {
+          duration: Toast.durations.LONG,
+          position: Toast.positions.CENTER,
+        });
+      }
     } catch (error) {
       console.error(error);
       Alert.alert(errorMessages.warning, errorMessages.ttsProblem);
     }
+  };
+
+  const getParkingAreaId = (id: number) => {
+    setParkingAreaId(id);
+    if (id == 0) {
+      setShowDescription(false);
+    }
+  };
+
+  const showParkingAreaDescription = (parkingAreaDescription: boolean) => {
+    setShowDescription(parkingAreaDescription);
+  };
+
+  const showParkingAreaDetails = (parkingAreaDetails: boolean) => {
+    setShowDetails(parkingAreaDetails);
+  };
+
+  const getParkingAreaData = (parkingAreaData: IParkingArea) => {
+    setParkingAreaData(parkingAreaData);
+  };
+
+  const getParkingAreaDetailsData = (
+    parkingAreaDetailData: IParkingAreaDetails
+  ) => {
+    setParkingAreaDetailsData(parkingAreaDetailData);
+  };
+
+  const getDataBaseError = (databaseError: boolean) => {
+    setDatabaseError(databaseError);
+  };
+
+  const showParkingAreaList = (showList: boolean) => {
+    if (showList === true) {
+      setVolume(false);
+    }
+    setOpenParkingAreaList(showList);
   };
 
   useEffect(() => {
@@ -134,42 +178,6 @@ export default function App() {
       Speech.stop();
     }
   }, [volume]);
-
-  const getParkingAreaId = (id: number) => {
-    setParkingAreaId(id);
-    if (id == 0) {
-      setShowDescription(false);
-    }
-  };
-
-  const showParkingAreaDescription = (parkingAreaDescription: boolean) => {
-    setShowDescription(parkingAreaDescription);
-  };
-
-  const showParkingAreaDetails = (parkingAreaDetails: boolean) => {
-    setShowDetails(parkingAreaDetails);
-  };
-
-  const getParkingAreaData = (parkingAreaData: IParkingArea) => {
-    setParkingAreaData(parkingAreaData);
-  };
-
-  const getParkingAreaDetailsData = (
-    parkingAreaDetailData: IParkingAreaDetails
-  ) => {
-    setParkingAreaDetailsData(parkingAreaDetailData);
-  };
-
-  const getDataBaseError = (databaseError: boolean) => {
-    setDatabaseError(databaseError);
-  };
-
-  const showParkingAreaList = (showList: boolean) => {
-    if (showList === true) {
-      setVolume(false);
-    }
-    setOpenParkingAreaList(showList);
-  };
 
   return (
     <RootSiblingParent>
