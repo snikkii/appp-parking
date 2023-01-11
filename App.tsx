@@ -1,10 +1,10 @@
 import { StatusBar } from "expo-status-bar";
-import { Dimensions, StyleSheet, View } from "react-native";
+import { Alert, Dimensions, StyleSheet, View } from "react-native";
 import { ParkingMap } from "./src/components/ParkingMap";
 import { useEffect, useState } from "react";
 import ParkingAreaDescription from "./src/components/ParkingAreaDescription";
 import ParkingAreaList from "./src/components/ParkingAreaList";
-import { DbConnectionService } from "./src/database/DbConnectionService";
+import { DbConnectionService } from "./src/services/DbConnectionService";
 import { Ionicons } from "@expo/vector-icons";
 import ParkingAreaDetails from "./src/components/ParkingAreaDetails";
 import { RootSiblingParent } from "react-native-root-siblings";
@@ -15,6 +15,7 @@ import { colors } from "./src/colors";
 import { IEventData } from "./src/models/IEventData";
 import * as Speech from "expo-speech";
 import { allParkingAreas } from "./src/AllParkingAreas";
+import { errorMessages } from "./src/strings";
 
 const dbConnectionService = new DbConnectionService();
 
@@ -22,8 +23,6 @@ export default function App() {
   const [parkingAreaId, setParkingAreaId] = useState(0);
   const [showDescription, setShowDescription] = useState(false);
   const [showDetails, setShowDetails] = useState(false);
-  const [latUser, setLatUser] = useState(0);
-  const [longUser, setLongUser] = useState(0);
   const [openParkingAreaList, setOpenParkingAreaList] = useState(false);
   const [volume, setVolume] = useState(false);
   const [databaseError, setDatabaseError] = useState(false);
@@ -33,14 +32,23 @@ export default function App() {
   );
   const MINUTES_MS = 600000; // 10 minutes
   const geofenceEventData = useGeofenceEvent();
-  const speak = (parkingAreaName: string) => {
-    Speech.speak("Parkmöglichkeit in der Nähe: " + parkingAreaName, {
-      language: "de-DE",
-    });
-  };
   const [areParkingAreasInGeofence, setAreParkingAreasInGeofence] = useState(
     [] as IEventData[]
   );
+  const [freeLots, setFreeLots] = useState(0);
+
+  const speak = (parkingAreaName: string, freeLots: number) => {
+    let text =
+      "Parkmöglichkeit " +
+      parkingAreaName +
+      " in der Nähe. Es sind noch " +
+      freeLots.toString() +
+      " Parkplätze frei.";
+    Speech.speak(text, {
+      language: "de-DE",
+    });
+    console.log(text);
+  };
   const getCurrentGeofenceData = (name: string, entered: boolean) => {
     let newGeofenceEventData = [...areParkingAreasInGeofence];
     newGeofenceEventData.map((parkingArea) => {
@@ -59,6 +67,23 @@ export default function App() {
       });
     });
   }
+
+  const getFreeParkingLots = async (
+    parkingAreaName: string,
+    parkingAreaId: number
+  ) => {
+    try {
+      let parkingAreaDetails =
+        (await dbConnectionService.getDataFromParkingAreaDetailsTable(
+          parkingAreaId
+        )) as IParkingAreaDetails;
+      setFreeLots(parkingAreaDetails.numberOfFreeLots);
+      speak(parkingAreaName, parkingAreaDetails.numberOfFreeLots);
+    } catch (error) {
+      console.error(error);
+      Alert.alert(errorMessages.warning, errorMessages.ttsProblem);
+    }
+  };
 
   useEffect(() => {
     dbConnectionService.createTables();
@@ -83,7 +108,16 @@ export default function App() {
         )
       );
       if (volume === true) {
-        speak(geofenceEventData.parkingAreaName);
+        try {
+          allParkingAreas
+            .filter((area) => area.name === geofenceEventData.parkingAreaName)
+            .map((area) => {
+              getFreeParkingLots(geofenceEventData.parkingAreaName, area.id);
+            });
+        } catch (error) {
+          console.error(error);
+          Alert.alert(errorMessages.warning, errorMessages.ttsProblem);
+        }
       }
     } else if (geofenceEventData.enteredParkingArea === false) {
       setAreParkingAreasInGeofence(

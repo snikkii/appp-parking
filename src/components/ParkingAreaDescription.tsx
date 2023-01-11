@@ -9,7 +9,7 @@ import {
   Linking,
 } from "react-native";
 import { useEffect, useState } from "react";
-import { DbConnectionService } from "../database/DbConnectionService";
+import { DbConnectionService } from "../services/DbConnectionService";
 import { IParkingArea } from "../models/IParkingArea";
 import { IParkingAreaDetails } from "../models/IParkingAreaDetails";
 import { MaterialIcons, Ionicons } from "@expo/vector-icons";

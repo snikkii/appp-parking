@@ -8,7 +8,7 @@ import {
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useEffect, useState } from "react";
-import { DbConnectionService } from "../database/DbConnectionService";
+import { DbConnectionService } from "../services/DbConnectionService";
 import * as SQLite from "expo-sqlite";
 import { IParkingArea } from "../models/IParkingArea";
 import { IParkingAreaDetails } from "../models/IParkingAreaDetails";

@@ -18,6 +18,8 @@ export const sqlQuerys = {
     "select * from parkingdetails where parkingAreaId = ? order by dateOfData asc",
   selectAllFromParkingAreaDetailsWithIdLimit1:
     "select * from parkingdetails where parkingAreaId = ? order by dateOfData desc limit 1",
+  selectFreeParkingLotsFromParkingAreaDetails:
+    "select numberOfFreeLots from parkingdetails where id = ? order by dateOfData asc",
   deleteOldRecordFromParkingAreaDetails:
     "delete from parkingdetails where parkingAreaId = ? and dateOfData = ?",
 };
@@ -42,6 +44,7 @@ export const errorMessages = {
   noApiConnectionMessage:
     "Die aktuellen Parkhausdaten konnten nicht abgerufen werden. Bitte Internetverbindung prüfen!",
   noParkingAreas: "Die Parkhäuser können aktuell nicht angezeigt werden.",
+  ttsProblem: "Sprachausgabe konnte nicht ausgeführt werden.",
 };
 
 export const outputText = {

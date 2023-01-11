@@ -1,6 +1,6 @@
 import { StyleSheet, Dimensions, View, Alert } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import { DbConnectionService } from "../database/DbConnectionService";
+import { DbConnectionService } from "../services/DbConnectionService";
 import { IParkingArea } from "../models/IParkingArea";
 import { useEffect, useState } from "react";
 import { IParkingAreaDetails } from "../models/IParkingAreaDetails";
