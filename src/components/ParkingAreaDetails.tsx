@@ -1,4 +1,4 @@
-import { StyleSheet, Dimensions, View, Alert } from "react-native";
+import { StyleSheet, Dimensions, View, Alert, Text } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { DbConnectionService } from "../services/DbConnectionService";
 import { IParkingArea } from "../models/IParkingArea";
@@ -18,7 +18,7 @@ interface IParkingAreaDetailsList {
   databaseError: boolean;
 }
 
-export default function ParkingAreaList(props: IParkingAreaDetailsList) {
+export default function ParkingAreaDetails(props: IParkingAreaDetailsList) {
   const {
     dbConnectionService,
     handleShowParkingAreaDetails,
@@ -27,7 +27,6 @@ export default function ParkingAreaList(props: IParkingAreaDetailsList) {
     databaseError,
   } = props;
   const [favorite, setFavorite] = useState(0);
-  const [trend, setTrend] = useState("");
   const showParkingAreaDetails = (showDetails: boolean) => {
     handleShowParkingAreaDetails(showDetails);
   };
@@ -35,13 +34,6 @@ export default function ParkingAreaList(props: IParkingAreaDetailsList) {
 
   useEffect(() => {
     setFavorite(parkingAreaData.favorite);
-    if (parkingAreaDetailsData.trend === -1) {
-      setTrend(outputText.trendDown);
-    } else if (parkingAreaDetailsData.trend === 0) {
-      setTrend(outputText.trendNeutral);
-    } else if (parkingAreaDetailsData.trend === 1) {
-      setTrend(outputText.trendUp);
-    }
     if (parkingAreaData.openingHours === undefined) {
       setHours("");
     } else {
@@ -94,8 +86,11 @@ export default function ParkingAreaList(props: IParkingAreaDetailsList) {
             <ParkingAreaDetailsItem
               errorStyle={true}
               headingText={errorMessages.attentionText}
-              bodyText={[errorMessages.databaseProblem]}
-            />
+            >
+              <Text style={styles.listText}>
+                {errorMessages.databaseProblem}
+              </Text>
+            </ParkingAreaDetailsItem>
           </View>
         </View>
       ) : (
@@ -132,14 +127,16 @@ export default function ParkingAreaList(props: IParkingAreaDetailsList) {
               <ParkingAreaDetailsItem
                 errorStyle={true}
                 headingText={outputText.closed}
-                bodyText={[errorMessages.closedText]}
-              />
+              >
+                <Text style={styles.listText}>{errorMessages.closedText}</Text>
+              </ParkingAreaDetailsItem>
             ) : (
               <ParkingAreaDetailsItem
                 errorStyle={false}
                 headingText={outputText.open}
-                bodyText={[hours]}
-              />
+              >
+                <Text style={styles.listText}>{hours}</Text>
+              </ParkingAreaDetailsItem>
             )}
 
             {parkingAreaData.address === "" ||
@@ -147,8 +144,9 @@ export default function ParkingAreaList(props: IParkingAreaDetailsList) {
               <ParkingAreaDetailsItem
                 errorStyle={false}
                 headingText={outputText.address}
-                bodyText={[parkingAreaData.address]}
-              />
+              >
+                <Text style={styles.listText}>{parkingAreaData.address}</Text>
+              </ParkingAreaDetailsItem>
             )}
 
             {parkingAreaData.doorHeight === "" ||
@@ -156,10 +154,11 @@ export default function ParkingAreaList(props: IParkingAreaDetailsList) {
               <ParkingAreaDetailsItem
                 errorStyle={false}
                 headingText={outputText.doorHeight}
-                bodyText={[
-                  parkingAreaData.doorHeight + outputText.doorHeightText,
-                ]}
-              />
+              >
+                <Text style={styles.listText}>
+                  {parkingAreaData.doorHeight + outputText.doorHeightText}
+                </Text>
+              </ParkingAreaDetailsItem>
             )}
 
             {parkingAreaData.pricePerHour === "" ||
@@ -167,27 +166,53 @@ export default function ParkingAreaList(props: IParkingAreaDetailsList) {
               <ParkingAreaDetailsItem
                 errorStyle={false}
                 headingText={outputText.price}
-                bodyText={[parkingAreaData.pricePerHour + outputText.priceText]}
-              />
+              >
+                <Text style={styles.listText}>
+                  {parkingAreaData.pricePerHour + outputText.priceText}
+                </Text>
+              </ParkingAreaDetailsItem>
             )}
 
             <ParkingAreaDetailsItem
               errorStyle={false}
               headingText={outputText.lots}
-              bodyText={[
-                outputText.lotsAll + parkingAreaDetailsData.numberOfLots,
-                outputText.lotsTaken + parkingAreaDetailsData.numberOfTakenLots,
-                outputText.lotsFree + parkingAreaDetailsData.numberOfFreeLots,
-                outputText.lotsTrend + trend,
-              ]}
-            />
+            >
+              <Text style={styles.listText}>
+                {outputText.lotsAll + parkingAreaDetailsData.numberOfLots}
+              </Text>
+              <Text style={styles.listText}>
+                {outputText.lotsTaken +
+                  parkingAreaDetailsData.numberOfTakenLots}
+              </Text>
+              <Text style={styles.listText}>
+                {outputText.lotsFree + parkingAreaDetailsData.numberOfFreeLots}
+              </Text>
+              {parkingAreaDetailsData.trend === 1 && (
+                <Text style={styles.listText}>
+                  {outputText.lotsTrend + outputText.trendUp}
+                </Text>
+              )}
+              {parkingAreaDetailsData.trend === 0 && (
+                <Text style={styles.listText}>
+                  {outputText.lotsTrend + outputText.trendNeutral}
+                </Text>
+              )}
+              {parkingAreaDetailsData.trend === -1 && (
+                <Text style={styles.listText}>
+                  {outputText.lotsTrend + outputText.trendDown}
+                </Text>
+              )}
+            </ParkingAreaDetailsItem>
 
             {parkingAreaDetailsData.status !== "OK" ? (
               <ParkingAreaDetailsItem
                 errorStyle={true}
                 headingText={outputText.currentStatus}
-                bodyText={[parkingAreaDetailsData.status]}
-              />
+              >
+                <Text style={styles.listText}>
+                  {parkingAreaDetailsData.status}
+                </Text>
+              </ParkingAreaDetailsItem>
             ) : undefined}
           </View>
         </View>
@@ -227,5 +252,10 @@ const styles = StyleSheet.create({
     marginBottom: 50,
     justifyContent: "center",
     alignItems: "center",
+  },
+  listText: {
+    color: colors.white,
+    fontSize: 20,
+    alignItems: "flex-start",
   },
 });

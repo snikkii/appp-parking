@@ -1,14 +1,15 @@
+import { ReactNode } from "react";
 import { StyleSheet, Text, Dimensions, View } from "react-native";
 import { colors } from "../colors";
 
 interface IParkingAreaDetailsItem {
   errorStyle: boolean;
   headingText: string;
-  bodyText: string[];
+  children: ReactNode;
 }
 
 export default function ParkingAreaDetailsItem(props: IParkingAreaDetailsItem) {
-  const { errorStyle, headingText, bodyText } = props;
+  const { errorStyle, headingText, children } = props;
 
   return (
     <View style={styles.itemContainer}>
@@ -20,13 +21,7 @@ export default function ParkingAreaDetailsItem(props: IParkingAreaDetailsItem) {
             {headingText}
           </Text>
         </View>
-        <View style={styles.listItem}>
-          {bodyText.map((text: string) => (
-            <Text key={text} style={styles.listText}>
-              {text}
-            </Text>
-          ))}
-        </View>
+        <View style={styles.listItem}>{children}</View>
       </View>
     </View>
   );
@@ -70,11 +65,6 @@ const styles = StyleSheet.create({
   listHeading: {
     color: colors.babyBlue,
     fontSize: 15,
-    alignItems: "flex-start",
-  },
-  listText: {
-    color: colors.white,
-    fontSize: 20,
     alignItems: "flex-start",
   },
 });
