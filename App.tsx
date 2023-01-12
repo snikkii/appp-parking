@@ -81,7 +81,9 @@ export default function App() {
           outputText.inGeofenceMessagePart1 +
           parkingAreaDetails.numberOfFreeLots.toString() +
           outputText.inGeofenceMessagePart2;
-        speak(text);
+        if (volume === true) {
+          speak(text);
+        }
         Toast.show(text, {
           duration: Toast.durations.LONG,
           position: Toast.positions.CENTER,
@@ -151,17 +153,15 @@ export default function App() {
           geofenceEventData.enteredParkingArea
         )
       );
-      if (volume === true) {
-        try {
-          allParkingAreas
-            .filter((area) => area.name === geofenceEventData.parkingAreaName)
-            .map((area) => {
-              getFreeParkingLots(geofenceEventData.parkingAreaName, area.id);
-            });
-        } catch (error) {
-          console.error(error);
-          Alert.alert(errorMessages.warning, errorMessages.ttsProblem);
-        }
+      try {
+        allParkingAreas
+          .filter((area) => area.name === geofenceEventData.parkingAreaName)
+          .map((area) => {
+            getFreeParkingLots(geofenceEventData.parkingAreaName, area.id);
+          });
+      } catch (error) {
+        console.error(error);
+        Alert.alert(errorMessages.warning, errorMessages.ttsProblem);
       }
     } else if (geofenceEventData.enteredParkingArea === false) {
       setAreParkingAreasInGeofence(
