@@ -51,6 +51,11 @@ export default function ParkingAreaDescription(props: IParkingAreaDescription) {
   const [favorite, setFavorite] = useState(0);
   const [showLetsGoButton, setShowLetsGoButton] = useState(false);
 
+  // Um die Daten beim Laden der Komponente aus der Datenbank zu bekommen
+  // Dieser Aufruf muss asynchron erfolgen, da sonst die Komponente zuerst gerendert
+  // wird und die Daten erst danach ankommen. Damit man die Daten zum richtigen
+  // Zeitpunkt hat und die Komponente erst danach gerendert wird, sodass alles
+  // angezeigt wird, ist eine asynchrone Funktion wichtig.
   const fetchDataFromTable = async () => {
     try {
       let parkingAreas = (await dbConnectionService.getDataFromParkingAreaTable(
@@ -77,6 +82,8 @@ export default function ParkingAreaDescription(props: IParkingAreaDescription) {
     }
   };
 
+  // Sollte der Nutzer auf das Herz klicken, wird eine Verbindung zur Datenbank hergestellt, um einzutragen,
+  // ob sich die Parkmöglichkeit nun in den Favoriten befindet oder nicht.
   const setFavoriteParkingArea = (favorite: number) => {
     try {
       dbConnectionService.setFavoriteParkingArea(
@@ -100,6 +107,8 @@ export default function ParkingAreaDescription(props: IParkingAreaDescription) {
     }
   };
 
+  // Mit dieser Funktion werden die Daten aus der Komponete herausgetragen und können
+  // so anderweitig benutzt werden.
   const handleParkingAreaDetailsData = (showDetails: boolean) => {
     handleDataBaseError(databaseError);
     handleParkingAreaData(parkingAreaData);
@@ -108,10 +117,13 @@ export default function ParkingAreaDescription(props: IParkingAreaDescription) {
     handleParkingAreaDetails(showDetails);
   };
 
+  // Zum Anzeigen oder Verbergen dieser Komponente
   const showParkingAreaDescription = (showDescription: boolean) => {
     handleShowParkingAreaDescription(showDescription);
   };
 
+  // Wenn der Nutzer die Navigation starten möchte, wird er gefragt, ob
+  // er die Anwendung wechseln und zu Google/Apple Maps möchte.
   const requestSwitchingApps = () => {
     handleVolume(false);
     Alert.alert(
@@ -129,6 +141,8 @@ export default function ParkingAreaDescription(props: IParkingAreaDescription) {
     );
   };
 
+  // Wenn der Nutzer die Navigation starten möchte, so wird eine URL gebaut und diese dann geöffnet.
+  // Quelle: https://stackoverflow.com/questions/45527549/react-native-opening-native-maps
   const navigateToParkingArea = () => {
     const destination = `${parkingAreaData.lat},${parkingAreaData.long}`;
     const company =
@@ -138,17 +152,21 @@ export default function ParkingAreaDescription(props: IParkingAreaDescription) {
     Linking.openURL(`https://maps.${company}.com/maps?daddr=${destination}`);
   };
 
+  // Sollte sich die ID ändern oder der Wert von handleParkingAreaDetails, so werden die Daten neu aus
+  // der Datenbank abgerufen
   useEffect(() => {
     fetchDataFromTable();
   }, [id, handleParkingAreaDetails]);
 
+  // Mit diesem Hook wird der Button zum Starten der Navigation nur angezeigt,
+  // wenn sich der Nutzer im Geofence befindet.
   useEffect(() => {
     geofenceEventData.map((parkingArea: IEventData) => {
       if (parkingArea.parkingAreaName === parkingAreaData.name) {
         setShowLetsGoButton(parkingArea.enteredParkingArea);
       }
     });
-  });
+  }, []);
 
   return (
     <View style={styles.container}>

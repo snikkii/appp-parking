@@ -23,6 +23,7 @@ export function ParkingMap(props: IParkingMapProps) {
 
   let regions: Location.LocationRegion[] = [];
 
+  // Jedes Parkhaus bekommt eine Region zugeteilt, sodass das Geofencing genutzt werden kann.
   allParkingAreas.map((parkingArea: IParkingArea) => {
     regions.push({
       identifier: parkingArea.name,
@@ -31,6 +32,12 @@ export function ParkingMap(props: IParkingMapProps) {
       radius: 200,
     });
   });
+
+  // Um den aktuellen Standort und das Geofencing benutzen zu können, muss der
+  // Nutzer seine Erlaubnis erteilen. Typischerweise wird zuerst danach gefragt,
+  // ob auf den Standort zugegriffen werden kann, wenn die App geöffnet ist.
+  // Ist diese Erlaubnis erteilt, so kann man nach der Standortabfrage im Hintergrund
+  // fragen. Danach wird noch nach der aktuellen Position gefragt.
   const locationPermissions = () => {
     Location.requestForegroundPermissionsAsync()
       .then(() => {
@@ -59,6 +66,8 @@ export function ParkingMap(props: IParkingMapProps) {
       });
   };
 
+  // Beim erstmaligen Öffnen der App wird nach den Erlaubnissen gefragt und über den
+  // Task-Manager das Geofencing gestartet.
   useEffect(() => {
     locationPermissions();
 
@@ -71,6 +80,8 @@ export function ParkingMap(props: IParkingMapProps) {
     }
   }, []);
 
+  // it dieser Funktion werden Daten beim Drücken eines Markers an andere
+  // Komponenten weitergegeben.
   const handleSetValues = (id: number, showDescription: boolean) => {
     handleParkingAreaId(id);
     handleParkingAreaDescription(showDescription);
@@ -84,13 +95,15 @@ export function ParkingMap(props: IParkingMapProps) {
         region={
           location
             ? {
-                longitude: location.coords.longitude, // this is where i am
+                longitude: location.coords.longitude,
                 latitude: location.coords.latitude,
                 latitudeDelta: 0.01,
                 longitudeDelta: 0.01,
               }
             : {
-                longitude: 11.853035893058891, // this is somewhere in amberg
+                // Falls die aktuelle Position nicht erkannt wird, wird ein Punkt am
+                // Altstadtring in Amberg gewählt.
+                longitude: 11.853035893058891,
                 latitude: 49.447723353888115,
                 latitudeDelta: 0.01,
                 longitudeDelta: 0.01,

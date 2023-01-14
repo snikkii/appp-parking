@@ -32,6 +32,7 @@ export default function ParkingAreaDetails(props: IParkingAreaDetailsList) {
   };
   const [hours, setHours] = useState("");
 
+  // Umwandeln des Zahlenwerts der Öffnungszeiten der Parkmöglichkeiten in einen String
   useEffect(() => {
     setFavorite(parkingAreaData.favorite);
     if (parkingAreaData.openingHours === undefined) {
@@ -41,6 +42,8 @@ export default function ParkingAreaDetails(props: IParkingAreaDetailsList) {
     }
   }, [parkingAreaData]);
 
+  // Mit dieser Funktion wird die Parkmöglichkeit favorisiert oder von den Favoriten entfernt.
+  // Angezeigt wird dies mit einem Toast.
   const setFavoriteParkingArea = (favorite: number) => {
     try {
       dbConnectionService.setFavoriteParkingArea(

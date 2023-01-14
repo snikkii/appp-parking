@@ -7,6 +7,8 @@ import { configStrings, errorMessages } from "../strings";
 
 let geofenceHandles: TaskManager.TaskManagerTaskExecutor[] = [];
 
+// Hier wird der Task definiert: Es sollen alle Funktionen aus geofenceHandles
+// hintereinander ausgeführt werden.
 TaskManager.defineTask(configStrings.geofenceTask, (data) => {
   for (const handle of geofenceHandles) {
     handle(data);
@@ -14,6 +16,9 @@ TaskManager.defineTask(configStrings.geofenceTask, (data) => {
 });
 
 export function useGeofenceEvent() {
+  // Man benötigt den useState und das "normale" Objekt, da der useState die
+  // Daten nach draußen in andere Bereiche der App bringt und das Objekt
+  // für Vergleiche innerhalb dieses Hooks genutzt wird.
   const [eventData, setEventData] = useState({
     parkingAreaName: "",
     enteredParkingArea: false,
@@ -34,6 +39,8 @@ export function useGeofenceEvent() {
         });
       }
 
+      // Wenn das Geofence mehrmals hintereinander fehlerhaft betreten wird,
+      // wird die Funktion nicht weiter ausgeführt.
       if (currentData.enteredParkingArea === true) {
         if (
           data.region.identifier === currentData.parkingAreaName &&
@@ -60,6 +67,8 @@ export function useGeofenceEvent() {
       }
     };
 
+    // Die eben definierte Funktion kommt zur Abfolge der Funktionen in geofenceHandles
+    // und wird nach Ausführung anschließend wieder entfernt.
     geofenceHandles.push(handleIsInGeofence);
     return () => {
       geofenceHandles = geofenceHandles.filter(

@@ -8,6 +8,8 @@ interface IParkingAreaDetailsItem {
   children: ReactNode;
 }
 
+// Damit die Anzeigeelemente in der ParkingAreaDetails-Komponente einheitlich sind, wurde vorliegende
+// Komponente erstellt. Sie ist für die Kacheln der Anzeige verantwortlich.
 export default function ParkingAreaDetailsItem(props: IParkingAreaDetailsItem) {
   const { errorStyle, headingText, children } = props;
 

@@ -42,6 +42,7 @@ export default function ParkingAreaList(props: IParkingAreaList) {
   );
   const [databaseError, setDatabaseError] = useState(false);
 
+  // Die Namen der Parkmöglichkeiten werden aus der Datenbank geholt und in einem useState gespeichert.
   const fetchDataFromTable = async () => {
     try {
       let parkingAreasAsList =
@@ -55,6 +56,9 @@ export default function ParkingAreaList(props: IParkingAreaList) {
     }
   };
 
+  // Bei Auswahl einer Parkmöglichkeit werden weitere Daten aus der Datenbank
+  // abgerufen. Außerdem werden vor Verlassen dieser Komponente noch weitere
+  // Werte gesetzt.
   const handleSetValues = async (id: number) => {
     try {
       let parkingAreas = (await dbConnectionService.getDataFromParkingAreaTable(
@@ -81,11 +85,15 @@ export default function ParkingAreaList(props: IParkingAreaList) {
     }
   };
 
+  // Hiermit wird die Komponente geschlossen, wenn der Zurück-Pfeil getätigt wird.
   const showParkingAreaList = (show: boolean) => {
     handleShowParkingAreaList(show);
     handleParkingAreaDescription(show);
   };
 
+  // Falls in der Detailansicht eine Parkmöglichkeit favorisiert oder von den Favoriten entfernt
+  // wurde, werden sich die Daten jedes Mal, wenn die Detailansicht verlassen wird und man
+  // wieder in der Liste landet, neu geholt.
   useEffect(() => {
     fetchDataFromTable();
   }, [handleParkingAreaDetails]);

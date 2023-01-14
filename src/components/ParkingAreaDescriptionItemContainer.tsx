@@ -10,6 +10,7 @@ interface IParkingAreaDescriptionItemContainer {
   iconColor: string;
 }
 
+// Komponente zum Anzeigen der Kacheln der ParkingAreaDescription-Komponente
 export default function ParkingAreaDescriptionItemContainer(
   props: IParkingAreaDescriptionItemContainer
 ) {

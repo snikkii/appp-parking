@@ -17,6 +17,7 @@ export class DbConnectionService {
         };
       };
 
+  // Im Konstruktor wird die Datenbank beim Neuerstellen eines DbConnectionServices geöffnet.
   constructor() {
     this.parkingAreaDb = this.openDatabase();
   }
@@ -35,11 +36,11 @@ export class DbConnectionService {
     return db;
   };
 
+  // Hier werden die Tabellen parkingarea und parkingdetails erstellt, falls sie nicht existieren.
+  // In die Tabelle parkingarea werden bei Neuerstellung die Daten der Parkmöglichkeiten eingefügt.
   public createTables = () => {
     this.parkingAreaDb.transaction(
       (tx) => {
-        // tx.executeSql("drop table parkingdetails");
-        // tx.executeSql("drop table parkingarea");
         tx.executeSql(sqlQuerys.createTableParkingArea);
         tx.executeSql(sqlQuerys.selectAllFromParkingArea, [], (_, { rows }) => {
           if (rows.length == 0) {
@@ -66,6 +67,8 @@ export class DbConnectionService {
     );
   };
 
+  // Hier wird die API angesprochen. Die Daten der Parkmöglichkeiten
+  // werden direkt in die Datenbank parkingdetails eingefügt.
   public getData = () => {
     fetch(configStrings.parkingAreaDetailsApi)
       .then((response) => response.text())
@@ -100,6 +103,7 @@ export class DbConnectionService {
       });
   };
 
+  // Dies ist die Funktion zum Einfügen der Daten in die parkingdetails-Tabelle.
   private insertIntoDetailsTable = (
     name: string,
     dateOfData: string,
@@ -140,6 +144,9 @@ export class DbConnectionService {
           closed,
           dateOfData,
         ]);
+        // Gibt es mehr als 4 oder genau 4 Datensätze pro Parkhaus in der Tabelle,
+        // so wird der älteste gelöscht. Dies hat den Grund, dass die Tabelle nicht
+        // unendlich groß und mit Daten gefüllt wird, die nahezu nie benötigt werden.
         tx.executeSql(
           sqlQuerys.selectAllFromParkingAreaDetailsWithId,
           [id],
@@ -173,6 +180,10 @@ export class DbConnectionService {
     );
   };
 
+  // Mit Hilfe der ID werden hier die Daten einer Parkmöglichkeit aus der
+  // Datenbank geholt und in einem Objekt gespeichert und zurückgegeben.
+  // Damit die Daten in der jeweiligen Komponente ankommen, muss diese Funktion
+  // asynchron sein und ein Promise zurückgeben.
   public getDataFromParkingAreaTable = async (parkingAreaId: number) => {
     let parkingAreaDetails = {} as IParkingArea;
     return new Promise((resolve, reject) => {
@@ -203,6 +214,9 @@ export class DbConnectionService {
     });
   };
 
+  // Hier passiert daselbe wie in der Funktion getDataFromParkingAreaTable(). Der
+  // einzige Unterschied ist, dass hier die Daten der parkingdetails-Tabelle
+  // entnommen werden.
   public getDataFromParkingAreaDetailsTable = async (parkingAreaId: number) => {
     let parkingAreaDetails = {} as IParkingAreaDetails;
     return new Promise((resolve, reject) => {
@@ -243,6 +257,9 @@ export class DbConnectionService {
     });
   };
 
+  // Hier werden alle Parkmöglichkeiten aus der parkingarea-Tabelle geholt.
+  // Damit die Anzeige in der ParkingList-Komponente richtig ist, wird zuerst
+  // nach Favoriten und dann alphabetisch nach Namen sortiert.
   public getParkingAreas = async () => {
     return new Promise((resolve, reject) => {
       this.parkingAreaDb.transaction(
@@ -262,6 +279,8 @@ export class DbConnectionService {
     });
   };
 
+  // Diese Funktion verändert den Wert der Spalte "Favorite" der parkingarea-Tabelle einer
+  // bestimmten Parkmöglichkeit.
   public setFavoriteParkingArea = (favorite: number, name: string) => {
     this.parkingAreaDb.transaction(
       (tx) => {

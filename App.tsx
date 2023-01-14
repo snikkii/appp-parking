@@ -37,6 +37,13 @@ export default function App() {
     [] as IEventData[]
   );
 
+  // Das Objekt areParkingAreasInGeofence wird gefüllt. Dies ist
+  // nötig, um die Information in welchen Geofences man sich
+  // im Moment befindet, auf einen Blick zu haben. Dieses Objekt
+  // wird an die ParkingAreaDescription-Komponente übergeben,
+  // damit der Button, der die Navigation starten soll, nur dann
+  // angezeigt wird, wenn sich der Nutzer im Geofence einer
+  // Parkmöglichkeit befindet.
   if (areParkingAreasInGeofence.length === 0) {
     allParkingAreas.map((parkingArea: IParkingArea) => {
       areParkingAreasInGeofence.push({
@@ -46,6 +53,7 @@ export default function App() {
     });
   }
 
+  // Die Funktion zur Sprachausgabe.
   const speak = (text: string) => {
     Speech.speak(text, {
       language: "de-DE",
@@ -56,6 +64,8 @@ export default function App() {
     });
   };
 
+  // Hier werden die eingehenden Geofence-Daten im Objekt areParkingAreasInGeofence
+  // ausgetauscht, wenn sich etwas verändert hat.
   const getCurrentGeofenceData = (name: string, entered: boolean) => {
     let newGeofenceEventData = [...areParkingAreasInGeofence];
     newGeofenceEventData.map((parkingArea) => {
@@ -66,6 +76,15 @@ export default function App() {
     return newGeofenceEventData;
   };
 
+  // Mit dieser Funktion wird eine Datenbankverbindung hergestellt,
+  // um die aktuellen freien Parkplätze der Parkmöglichkeit zu bekommen,
+  // bei der gerade das Geofence betreten wurde. Hat der Nutzer den Ton
+  // angeschaltet, so bekommt er zusätzlich zum Toast per Sprachausgabe
+  // mitgeteilt, welches Geofence in der Nähe ist und wie viele Parkplätze
+  // noch frei sind. Gibt es keine freien Parkplätze mehr, so wird weder
+  // Ton ausgegeben, noch der Toast angezeigt.
+  // Die Funktion ist asynchron, da zunächst auf die Daten aus der Daten-
+  // banktabelle gewartet werden muss, bevor in der App weitergegangen wird.
   const getFreeParkingLots = async (
     parkingAreaName: string,
     parkingAreaId: number
@@ -95,6 +114,7 @@ export default function App() {
     }
   };
 
+  // Hier wird die ID der Parkmöglichkeit des angeklickten Markers verwaltet.
   const getParkingAreaId = (id: number) => {
     setParkingAreaId(id);
     if (id == 0) {
@@ -102,28 +122,36 @@ export default function App() {
     }
   };
 
+  // Dies dient zum Anzeigen der ParkingAreaDescription-Komponente.
   const showParkingAreaDescription = (parkingAreaDescription: boolean) => {
     setShowDescription(parkingAreaDescription);
   };
 
+  // Dies dient zum Anzeigen der ParkingAreaDetails-Komponente.
   const showParkingAreaDetails = (parkingAreaDetails: boolean) => {
     setShowDetails(parkingAreaDetails);
   };
 
+  // Diese Funktion ist zur Verwaltung der Daten der Parkmöglichkeiten.
   const getParkingAreaData = (parkingAreaData: IParkingArea) => {
     setParkingAreaData(parkingAreaData);
   };
 
+  // Diese Funktion ist zur Verwaltung der detaillierten Daten der Parkmöglichkeiten.
   const getParkingAreaDetailsData = (
     parkingAreaDetailData: IParkingAreaDetails
   ) => {
     setParkingAreaDetailsData(parkingAreaDetailData);
   };
 
+  // Diese Funktion ist zur Verwaltung von Datenbankfehlern. So wird verhindert, dass in
+  // der ParkingAreaDetails-Komponente nichts angezeigt wird. Gibt es einen Fehler,
+  // wird dem Nutzer eine Fehlermeldung angezeigt.
   const getDataBaseError = (databaseError: boolean) => {
     setDatabaseError(databaseError);
   };
 
+  // Dies dient zum Anzeigen der ParkingAreaList-Komponente.
   const showParkingAreaList = (showList: boolean) => {
     if (showList === true) {
       setVolume(false);
@@ -131,11 +159,16 @@ export default function App() {
     setOpenParkingAreaList(showList);
   };
 
+  // Wird die App geöffnet, werden die Tabellen erstellt und die detaillierten
+  // Daten der Parkmöglichkeiten abgerufen.
   useEffect(() => {
     dbConnectionService.createTables();
     dbConnectionService.getData();
   }, []);
 
+  // Dieses Interval dient dazu, die detaillierten Daten der Parkmöglichkeiten
+  // alle 10 Minuten abzufragen.
+  // Quelle: https://stackoverflow.com/questions/48601813/how-to-call-an-api-every-minute-for-a-dashboard-in-react
   useEffect(() => {
     const intervalCall = setInterval(() => {
       dbConnectionService.getData();
@@ -145,6 +178,7 @@ export default function App() {
     };
   }, []);
 
+  // Dieser Hook dient dazu, die Funktion getFreeParkingLots zu triggern.
   useEffect(() => {
     if (geofenceEventData.enteredParkingArea === true) {
       setAreParkingAreasInGeofence(
@@ -173,6 +207,8 @@ export default function App() {
     }
   }, [geofenceEventData]);
 
+  // Hier wird, falls der Ton ausgeschaltet wird, die Sprachausgabe
+  // sofort gestoppt.
   useEffect(() => {
     if (volume === false) {
       Speech.stop();

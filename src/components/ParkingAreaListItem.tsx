@@ -15,6 +15,7 @@ interface IParkingAreaListItem {
   favorite: number;
 }
 
+// Für die Anzeige der Kacheln in der Liste ist diese Komponente verantwortlich.
 export default function ParkingAreaListItem(props: IParkingAreaListItem) {
   const { onPressFunction, id, name, favorite } = props;
 

@@ -7,6 +7,7 @@ interface IParkingAreaListHeading {
   headingText: string;
 }
 
+// Diese Komponente zeigt jeweils die Überschirft in der ParkingAreaList und den ParkingAreaDetails an.
 export default function ParkingAreaListHeading(props: IParkingAreaListHeading) {
   const { arrowBackFunction, headingText } = props;
 
