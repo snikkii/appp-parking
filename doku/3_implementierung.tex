@@ -14,7 +14,8 @@ In diesem Kapitel wird die Implementierung beschrieben. Zunächst werden die Kom
 \end{figure}
 \newpage
 
-Die genutzten Farben werden generiert. Grundlage ist die zuvor ausgewählte dunkelgraue Hintergrundfarbe. So wird sichergestellt, dass die Farben auch wirklich zusammenpassen \cite{colors}. Eine Bibliothek für die Icons ist standardmäßig bei Expo-Projekten integriert, dennoch müssen die Bezeichnungen zu den passenden Icons gefunden werden, was über die react-native-vector-icons-Directory gut geklappt hat \cite{icons}.
+Die genutzten Farben werden generiert. Grundlage ist die zuvor ausgewählte dunkelgraue Hintergrundfarbe. So wird sichergestellt, dass die Farben auch wirklich zusammenpassen \cite{colors}. Eine Bibliothek für die Icons ist standardmäßig bei Expo-Projekten integriert, dennoch müssen die Bezeichnungen zu den passenden Icons gefunden werden, was über die react-native-vector-icons-Directory gut geklappt hat \cite{icons}. Für das Icon und den Ladescreen der App wird ein Icon von Material-Icon von Google verwendet \cite{locationIcon}.
+
 \section{Komponenten}
 Die Komponenten bilden alle Funktionen der App, welche visuell auf der Benutzeroberfläche wahrgenommen werden. Neben der Anzeige der Elemente beinhalten sie aber dennoch auch Funktionalität, wie beispielsweise das Aufrufen von Methoden der Datenbank-Klasse ,DbConnectionService'. Alle Komponenten, mit Ausnahme der ,App', besitzen ein eigenes Interface. Dieses Interface beinhaltet alle Elemente, die als Properties in die Komponente hineingegeben werden und die jeweils dazugehörigen Typen. Properties können als Parameter einer Komponente verstanden werden. Dies können neben Strings, Zahlenwerten oder boolschen Werten auch Funktionen oder andere Objekte sein.
 \subsection{Komponente ,App'}

@@ -305,6 +305,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.backgroundGray,
     alignItems: "center",
     justifyContent: "flex-end",
+    fontFamily: "sans-serif",
   },
   map: {
     flexDirection: "row",
