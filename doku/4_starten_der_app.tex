@@ -10,21 +10,11 @@ Damit das Projekt auf dem eigenen Rechner genutzt werden kann, müssen zunächst
 % TODO Das hier muss aber noch getestet werden
 % TODO für geofences background location, aber das geht nicht in expo go
 
-Da die Anwendung sowohl auf IOS und Android funktioniert, gibt es verschiedene Möglichkeiten, sie zu starten. Gearbeitet wird auf einem realen ,iPhone 11' und einem ,Pixel 5 API 33' im Android Emulator.
+Die Anwendung funktioniert auf Android. Gearbeitet wird auf einem ,Pixel 5 API 33' im Android Emulator.
 
-\section{Starten der Anwendung mit dem Android Emulator}
-Zunächst muss Android Studio heruntergeladen und installiert werden. Nach dem Start von Android Studio muss über den Device Manager ein passender Emulator heruntergeladen werden. Anschließend muss der Emulator gestartet werden. Danach können die Befehle aus \autoref{lst:startAndroid} in der Kommandozeile ausgeführt werden.
+Um die App zu starten, muss zunächst Android Studio heruntergeladen und installiert werden. Nach dem Start von Android Studio muss über den Device Manager ein passender Emulator heruntergeladen werden. Anschließend muss der Emulator gestartet werden. Danach können die Befehle aus \autoref{lst:startAndroid} in der Kommandozeile ausgeführt werden.
 \begin{lstlisting}[caption={Um die Anwendung mit mit Android zu starten, sollte Android Studio heruntergeladen und installiert sein. Anschließend muss der passende Emulator über den Device Manager hinzugefügt und gestartet werden. Danach werden diese Befehle in die Kommandozeile eingegeben und ausgeführt.},captionpos=b, language=Java, label=lst:startAndroid]
 	cd path/to/project
 	
 	yarn android
 \end{lstlisting}
-
-\section{Starten der Anwendung mit dem realen iPhone}
-Für die Ausführung auf dem iPhone muss zuerst die ,Expo-Go'-App aus dem App-Store heruntergeladen werden. Danach wird die Anwendung mit dem Befehl aus \autoref{lst:startIPhone} in der Kommandozeile gestartet. Mit der Kamera wird dann der QR-Code, der in der Konsole erscheint, gescannt. Anschließend wird die Anwendung in der ,Expo Go'-App geöffnet.
-\begin{lstlisting}[caption={Nachdem die ,Expo Go'-App im App-Store heruntergeladen wurde, kann mit der Ausführung dieser Befehle in der Kommandozeile die Anwendung gestartet werden. Anschließend wird der nun in der Konsole angezeigte QR-Code mit der iPhone-Kamera gescannt. Dann öffnet sich die Anwendung in der ,Expo Go'-App.},captionpos=b, language=Java, label=lst:startIPhone]
-	cd path/to/project
-	
-	yarn start
-\end{lstlisting}
-Sollte die Ausführung mit diesem Befehl nicht funktionieren, so kann statt ,yarn start' auch ,yarn start:pc' eingegeben werden. Dass der erste Befehl nicht funktioniert, könnte an einschränkenden Netzwerk- oder Firewall-Konfigurationen liegen \cite{tunneling}.
