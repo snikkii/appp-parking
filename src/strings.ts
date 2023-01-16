@@ -84,4 +84,5 @@ export const outputText = {
   platform: "ios",
   inGeofenceMessagePart1: " in der Nähe. ",
   inGeofenceMessagePart2: " freie Parkplätze.",
+  inGeofenceMessagePart2_oneLot: "Ein freier Parkplatz.",
 };

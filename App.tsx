@@ -95,11 +95,19 @@ export default function App() {
           parkingAreaId
         )) as IParkingAreaDetails;
       if (parkingAreaDetails.numberOfFreeLots !== 0) {
-        let text =
-          parkingAreaName +
-          outputText.inGeofenceMessagePart1 +
-          parkingAreaDetails.numberOfFreeLots.toString() +
-          outputText.inGeofenceMessagePart2;
+        let text = "";
+        if (parkingAreaDetails.numberOfFreeLots === 1) {
+          text =
+            parkingAreaName +
+            outputText.inGeofenceMessagePart1 +
+            outputText.inGeofenceMessagePart2_oneLot;
+        } else {
+          text =
+            parkingAreaName +
+            outputText.inGeofenceMessagePart1 +
+            parkingAreaDetails.numberOfFreeLots.toString() +
+            outputText.inGeofenceMessagePart2;
+        }
         if (volume === true) {
           speak(text);
         }

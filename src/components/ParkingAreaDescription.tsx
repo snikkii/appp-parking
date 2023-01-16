@@ -166,7 +166,7 @@ export default function ParkingAreaDescription(props: IParkingAreaDescription) {
         setShowLetsGoButton(parkingArea.enteredParkingArea);
       }
     });
-  }, [geofenceEventData]);
+  }, [geofenceEventData, parkingAreaData]);
 
   return (
     <View style={styles.container}>
